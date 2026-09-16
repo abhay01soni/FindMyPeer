@@ -1,0 +1,162 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root,
+html.dark {
+  --color-dark-950: 10 11 13;      /* #0A0B0D */
+  --color-dark-900: 15 16 20;      /* #0F1014 */
+  --color-dark-850: 20 22 28;      /* #14161C */
+  --color-dark-800: 26 28 36;      /* #1A1C24 */
+  --color-dark-700: 37 41 54;      /* #252936 */
+  --color-dark-600: 52 58 76;      /* #343A4C */
+
+  --color-techGray-100: 240 242 245; /* #F0F2F5 */
+  --color-techGray-300: 160 167 184; /* #A0A7B8 */
+  --color-techGray-400: 108 114 127; /* #6C727F */
+  --color-techGray-500: 74 80 94;    /* #4A505E */
+  --color-techGray-600: 42 46 57;    /* #2A2E39 */
+
+  --bg-color: #0A0B0D;
+  --text-color: #F0F2F5;
+  color-scheme: dark;
+}
+
+html.light {
+  --color-dark-950: 248 250 252;    /* #F8FAFC - slate 50 */
+  --color-dark-900: 255 255 255;    /* #FFFFFF - pure white */
+  --color-dark-850: 241 245 249;    /* #F1F5F9 - slate 100 */
+  --color-dark-800: 226 232 240;    /* #E2E8F0 - slate 200 */
+  --color-dark-700: 203 213 225;    /* #CBD5E1 - slate 300 */
+  --color-dark-600: 148 163 184;    /* #94A3B8 - slate 400 */
+
+  --color-techGray-100: 15 23 42;    /* #0F172A - slate 900 */
+  --color-techGray-300: 51 65 85;    /* #334155 - slate 700 */
+  --color-techGray-400: 100 116 139; /* #64748B - slate 500 */
+  --color-techGray-500: 148 163 184; /* #94A3B8 - slate 400 */
+  --color-techGray-600: 226 232 240; /* #E2E8F0 */
+
+  --bg-color: #F8FAFC;
+  --text-color: #0F172A;
+  color-scheme: light;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+::selection {
+  background: #ff7e6b;
+  color: #0c0d0f;
+}
+
+.font-handwriting {
+  font-family: 'Caveat', cursive, sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--color-dark-700));
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ff7e6b;
+}
+
+/* Subtle tech grid background pattern */
+.bg-tech-grid {
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+html.light .bg-tech-grid {
+  background-image: linear-gradient(to right, rgba(15, 23, 42, 0.05) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(15, 23, 42, 0.05) 1px, transparent 1px);
+}
+
+.bg-graph-paper {
+  background-color: #f8fafc;
+  background-image: 
+    linear-gradient(to right, rgba(148, 163, 184, 0.25) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.25) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.bg-dot-pattern {
+  background-image: radial-gradient(rgba(255, 126, 107, 0.15) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Specific light mode typography and container adjustments */
+html.light .text-white {
+  color: #0f172a;
+}
+html.light button.bg-coral-500,
+html.light a.bg-coral-500,
+html.light .bg-coral-500 span,
+html.light .bg-coral-500 svg,
+html.light .bg-coral-500.text-dark-950 {
+  color: #0a0b0d !important;
+}
+
+html.light .bg-emerald-500\/10 {
+  background-color: rgba(16, 185, 129, 0.12);
+}
+html.light .text-emerald-400 {
+  color: #059669;
+}
+html.light .border-emerald-500\/30 {
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+html.light .bg-coral-500\/10 {
+  background-color: rgba(255, 126, 107, 0.12);
+}
+html.light .text-coral-400 {
+  color: #c2410c;
+}
+
+html.light input,
+html.light textarea,
+html.light select {
+  background-color: #ffffff;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder {
+  color: #94a3b8;
+}
+
+/* Terminal blinking cursor */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-cursor {
+  animation: blink 1s infinite;
+}
+
+/* Glow effects */
+.glow-coral {
+  box-shadow: 0 0 25px rgba(255, 126, 107, 0.25);
+}
+
+.glow-cyan {
+  box-shadow: 0 0 25px rgba(86, 204, 242, 0.25);
+}
