@@ -1,12 +1,18 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Terminal, Send, CheckCircle2, User, Briefcase, Sparkles } from 'lucide-react';
+import { Terminal, Send, CheckCircle2, User, Briefcase, Sparkles, Loader2, Database } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/context/AuthContext';
+import { createClient, isSupabaseConfigured } from '@/lib/supabase/client';
 
 export default function WaitlistForm() {
+  const { user, profile, openAuthModal } = useAuth();
   const [role, setRole] = useState<'client' | 'expert'>('client');
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -17,6 +23,20 @@ export default function WaitlistForm() {
     consultationAreas: '',
     expectedPrice: '2500',
   });
+
+  // Pre-fill user data if authenticated
+  useEffect(() => {
+    if (user || profile) {
+      setFormData((prev) => ({
+        ...prev,
+        email: prev.email || profile?.email || user?.email || '',
+        fullName: prev.fullName || profile?.full_name || user?.user_metadata?.full_name || '',
+      }));
+      if (profile?.role) {
+        setRole(profile.role === 'expert' ? 'expert' : 'client');
+      }
+    }
+  }, [user, profile]);
 
   useEffect(() => {
     const handleSwitchRole = (e: CustomEvent<'client' | 'expert'>) => {
@@ -30,9 +50,50 @@ export default function WaitlistForm() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    const supabase = createClient();
+
+    try {
+      if (isSupabaseConfigured) {
+        const { error } = await supabase.from('waitlist_submissions').insert({
+          user_id: user?.id || null,
+          role,
+          full_name: formData.fullName,
+          email: formData.email,
+          linkedin_url: formData.linkedinUrl || null,
+          city: formData.city || null,
+          category: formData.category,
+          experience_years: formData.experienceYears,
+          expected_price: role === 'expert' ? parseFloat(formData.expectedPrice) || 0 : null,
+          consultation_areas: formData.consultationAreas || null,
+        });
+
+        if (error) {
+          console.error('Supabase waitlist insert error:', error);
+          setSubmitError(error.message);
+          setIsSubmitting(false);
+          return;
+        }
+      } else {
+        // Local simulation delay
+        await new Promise((resolve) => setTimeout(resolve, 600));
+        // Save in local storage for demo persistence
+        const existing = JSON.parse(localStorage.getItem('findmypeer_waitlist') || '[]');
+        existing.push({ ...formData, role, user_id: user?.id || null, timestamp: new Date().toISOString() });
+        localStorage.setItem('findmypeer_waitlist', JSON.stringify(existing));
+      }
+
+      setIsSubmitting(false);
+      setSubmitted(true);
+    } catch (err: any) {
+      console.error('Waitlist submission error:', err);
+      setSubmitError(err?.message || 'Failed to submit application.');
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -100,8 +161,9 @@ export default function WaitlistForm() {
                 </div>
 
                 <div className="space-y-2">
-                  <span className="text-xs text-coral-400 bg-dark-850 border border-dark-700 px-3 py-1 rounded">
-                    STATUS 200 OK — WAITLIST CONFIRMED
+                  <span className="text-xs text-coral-400 bg-dark-850 border border-dark-700 px-3 py-1 rounded inline-flex items-center gap-1.5">
+                    <Database className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>STATUS 200 OK — STORED IN {isSupabaseConfigured ? 'SUPABASE' : 'SANDBOX_DB'}</span>
                   </span>
                   <h3 className="text-2xl font-bold text-white font-sans pt-2">
                     Application Received, {formData.fullName || 'Builder'}!
@@ -114,15 +176,27 @@ export default function WaitlistForm() {
                 <div className="p-4 bg-dark-850 border border-dark-800 rounded-lg max-w-sm mx-auto text-left text-xs space-y-1 text-techGray-400">
                   <div>QUEUED TIMESTAMP: {new Date().toLocaleTimeString()}</div>
                   <div>QUEUE POSITION: #148</div>
+                  <div>DATA STORAGE: {isSupabaseConfigured ? 'public.waitlist_submissions' : 'Local Sandbox Session'}</div>
                   <div>VERIFICATION: PENDING INVITATION</div>
                 </div>
 
-                <button
-                  onClick={() => setSubmitted(false)}
-                  className="bg-dark-800 hover:bg-dark-750 text-techGray-300 hover:text-white px-5 py-2.5 rounded-md border border-dark-700 text-xs"
-                >
-                  &lt; Submit another response
-                </button>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                  <button
+                    onClick={() => setSubmitted(false)}
+                    className="bg-dark-800 hover:bg-dark-750 text-techGray-300 hover:text-white px-5 py-2.5 rounded-md border border-dark-700 text-xs cursor-pointer"
+                  >
+                    &lt; Submit another response
+                  </button>
+                  
+                  {!user && (
+                    <button
+                      onClick={() => openAuthModal(formData.email)}
+                      className="bg-coral-500 hover:bg-coral-600 text-dark-950 font-bold px-5 py-2.5 rounded-md text-xs cursor-pointer flex items-center gap-1.5"
+                    >
+                      <span>&gt; Sign in with Magic Link</span>
+                    </button>
+                  )}
+                </div>
               </motion.div>
             ) : (
               <motion.form
@@ -140,6 +214,12 @@ export default function WaitlistForm() {
                     <Sparkles className="w-3.5 h-3.5" /> NO SPAM GUARANTEE
                   </span>
                 </div>
+
+                {submitError && (
+                  <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-xs font-mono">
+                    {submitError}
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {/* Full Name */}
@@ -286,10 +366,20 @@ export default function WaitlistForm() {
                 {/* Submit button */}
                 <button
                   type="submit"
-                  className="w-full bg-coral-500 hover:bg-coral-600 text-dark-950 font-mono font-bold py-4 rounded-lg text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-xl active:scale-[0.99]"
+                  disabled={isSubmitting}
+                  className="w-full bg-coral-500 hover:bg-coral-600 disabled:opacity-50 text-dark-950 font-mono font-bold py-4 rounded-lg text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-xl active:scale-[0.99] cursor-pointer"
                 >
-                  <Send className="w-4 h-4" />
-                  <span>&gt; submit_waitlist_application</span>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>STORING_APPLICATION_IN_SUPABASE...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      <span>&gt; submit_waitlist_application</span>
+                    </>
+                  )}
                 </button>
               </motion.form>
             )}

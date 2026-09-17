@@ -2,6 +2,7 @@ import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/HeroSection';
 import NicheGrid from '@/components/NicheGrid';
 import FeaturedAdvisors from '@/components/FeaturedAdvisors';
+import AdvisorDiscovery from '@/components/AdvisorDiscovery';
 import HowItWorks from '@/components/HowItWorks';
 import TrustAndOffer from '@/components/TrustAndOffer';
 import WaitlistForm from '@/components/WaitlistForm';
@@ -15,6 +16,7 @@ export default function Home() {
       <HeroSection />
       <NicheGrid />
       <FeaturedAdvisors />
+      <AdvisorDiscovery />
       <HowItWorks />
       <TrustAndOffer />
       <WaitlistForm />

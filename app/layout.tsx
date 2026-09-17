@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import { AuthProvider } from '@/context/AuthContext';
+import AuthModal from '@/components/AuthModal';
 
 export const metadata: Metadata = {
   title: 'FindMyPeer — 1:1 Expert Consultation Marketplace',
@@ -36,7 +38,10 @@ export default function RootLayout({
       </head>
       <body className="bg-dark-950 text-techGray-100 min-h-screen antialiased selection:bg-coral-500 selection:text-dark-950">
         <ThemeProvider>
-          {children}
+          <AuthProvider>
+            {children}
+            <AuthModal />
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
