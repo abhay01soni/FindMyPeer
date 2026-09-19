@@ -17,6 +17,7 @@ import {
   Lock
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { checkIsSupabaseConfigured } from '@/lib/supabase/client';
 
 export default function AuthModal() {
   const { 
@@ -139,7 +140,7 @@ export default function AuthModal() {
           {/* Content */}
           <div className="p-6 sm:p-8 space-y-6">
 
-            {!isConfigured && (
+            {!checkIsSupabaseConfigured() && (
               <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg flex items-start gap-2.5 text-amber-400 text-xs font-mono">
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                 <div>

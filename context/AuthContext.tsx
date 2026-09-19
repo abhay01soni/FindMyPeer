@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import { User, Session, AuthChangeEvent } from '@supabase/supabase-js';
-import { createClient, isSupabaseConfigured } from '@/lib/supabase/client';
+import { createClient, checkIsSupabaseConfigured } from '@/lib/supabase/client';
 
 export interface UserProfile {
   id: string;
@@ -130,6 +130,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsAuthModalOpen(false);
   };
 
+  const isConfigured = checkIsSupabaseConfigured();
+
   // Direct Supabase Magic Link call
   const signInWithMagicLink = async (
     email: string,
@@ -139,7 +141,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { error: 'Please enter a valid email address.', success: false };
     }
 
-    if (!isSupabaseConfigured) {
+    if (!checkIsSupabaseConfigured()) {
       return {
         error: 'Supabase credentials are not configured in .env.local. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.',
         success: false,
@@ -181,7 +183,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { error: 'Please enter a valid 6-digit verification code.', success: false };
     }
 
-    if (!isSupabaseConfigured) {
+    if (!checkIsSupabaseConfigured()) {
       return {
         error: 'Supabase credentials are not configured in .env.local.',
         success: false,
@@ -279,7 +281,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         session,
         profile,
         isLoading,
-        isConfigured: isSupabaseConfigured,
+        isConfigured: checkIsSupabaseConfigured(),
         isAuthModalOpen,
         openAuthModal,
         closeAuthModal,
