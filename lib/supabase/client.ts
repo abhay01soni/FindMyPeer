@@ -11,15 +11,9 @@ export const isSupabaseConfigured = Boolean(
   supabaseUrl.startsWith('https://')
 );
 
-// Returns a singleton Supabase browser client
 export function createClient() {
-  if (!isSupabaseConfigured) {
-    // Return dummy client or client with fallback if not configured yet
-    return createBrowserClient(
-      supabaseUrl || 'https://placeholder-project.supabase.co',
-      supabaseAnonKey || 'placeholder-anon-key'
-    );
-  }
-
-  return createBrowserClient(supabaseUrl, supabaseAnonKey);
+  return createBrowserClient(
+    supabaseUrl || 'https://placeholder-project.supabase.co',
+    supabaseAnonKey || 'placeholder-anon-key'
+  );
 }

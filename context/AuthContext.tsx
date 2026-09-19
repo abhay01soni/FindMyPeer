@@ -8,8 +8,9 @@ export interface UserProfile {
   id: string;
   email: string;
   full_name?: string | null;
+  phone?: string | null;
   avatar_url?: string | null;
-  role: 'client' | 'expert' | 'admin';
+  role: 'client' | 'expert' | 'professional' | 'admin';
   headline?: string | null;
   bio?: string | null;
   linkedin_url?: string | null;
@@ -38,8 +39,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const DEMO_STORAGE_KEY = 'findmypeer_demo_auth_session';
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -50,22 +49,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const supabase = useMemo(() => createClient(), []);
 
-  // Fetch or construct profile
+  // Fetch or construct profile from Supabase
   const fetchProfile = async (currentUser: User) => {
-    if (!isSupabaseConfigured) {
-      // Local demo profile mode
-      const stored = localStorage.getItem(DEMO_STORAGE_KEY);
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          setProfile(parsed.profile);
-        } catch {
-          // ignore
-        }
-      }
-      return;
-    }
-
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -74,7 +59,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .single();
 
       if (error && error.code === 'PGRST116') {
-        // Profile doesn't exist yet, create default
         const newProfile: Partial<UserProfile> = {
           id: currentUser.id,
           email: currentUser.email || '',
@@ -100,24 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    if (!isSupabaseConfigured) {
-      // Check local storage demo session
-      const stored = localStorage.getItem(DEMO_STORAGE_KEY);
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          setUser(parsed.user);
-          setSession(parsed.session);
-          setProfile(parsed.profile);
-        } catch {
-          localStorage.removeItem(DEMO_STORAGE_KEY);
-        }
-      }
-      setIsLoading(false);
-      return;
-    }
-
-    // Live Supabase initialization
+    // Supabase session initialization
     const getInitialSession = async () => {
       try {
         const { data: { session: initialSession } } = await supabase.auth.getSession();
@@ -163,6 +130,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsAuthModalOpen(false);
   };
 
+  // Direct Supabase Magic Link call
   const signInWithMagicLink = async (
     email: string,
     role: 'client' | 'expert' = 'client'
@@ -172,45 +140,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     if (!isSupabaseConfigured) {
-      // Demo / simulated magic link auth
-      const mockUser: User = {
-        id: 'demo-user-' + Math.random().toString(36).substring(2, 9),
-        app_metadata: { provider: 'email' },
-        user_metadata: { role, full_name: email.split('@')[0] },
-        aud: 'authenticated',
-        created_at: new Date().toISOString(),
-        email: email,
-        phone: '',
-        role: 'authenticated',
-        updated_at: new Date().toISOString(),
+      return {
+        error: 'Supabase credentials are not configured in .env.local. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.',
+        success: false,
       };
-
-      const mockProfile: UserProfile = {
-        id: mockUser.id,
-        email: email,
-        full_name: email.split('@')[0],
-        role: role,
-        avatar_url: `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(email)}`,
-        created_at: new Date().toISOString(),
-      } as any;
-
-      const mockSession: Session = {
-        access_token: 'mock-token-' + Date.now(),
-        refresh_token: 'mock-refresh-' + Date.now(),
-        expires_in: 3600,
-        token_type: 'bearer',
-        user: mockUser,
-      };
-
-      localStorage.setItem(
-        DEMO_STORAGE_KEY,
-        JSON.stringify({ user: mockUser, session: mockSession, profile: mockProfile })
-      );
-
-      // We still simulate a brief sending delay for realistic UX
-      await new Promise((res) => setTimeout(res, 600));
-
-      return { error: null, success: true };
     }
 
     try {
@@ -239,6 +172,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Direct Supabase OTP Verification call
   const verifyOtp = async (
     email: string,
     token: string
@@ -248,15 +182,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     if (!isSupabaseConfigured) {
-      // Complete mock login
-      const stored = localStorage.getItem(DEMO_STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        setUser(parsed.user);
-        setSession(parsed.session);
-        setProfile(parsed.profile);
-      }
-      return { error: null, success: true };
+      return {
+        error: 'Supabase credentials are not configured in .env.local.',
+        success: false,
+      };
     }
 
     try {
@@ -267,7 +196,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (error) {
-        // also try email otp type if magiclink fails
+        // Try email OTP type if magiclink token type fails
         const retry = await supabase.auth.verifyOtp({
           email,
           token: token.trim(),
@@ -293,19 +222,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       return { error: null, success: true };
     } catch (err: any) {
-      return { error: err?.message || 'Failed to verify OTP.', success: false };
+      return { error: err?.message || 'Failed to verify OTP code.', success: false };
     }
   };
 
   const signOut = async () => {
-    if (!isSupabaseConfigured) {
-      localStorage.removeItem(DEMO_STORAGE_KEY);
-      setUser(null);
-      setSession(null);
-      setProfile(null);
-      return;
-    }
-
     try {
       await supabase.auth.signOut();
       setUser(null);
@@ -321,18 +242,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   ): Promise<{ error: string | null; success: boolean }> => {
     if (!user) {
       return { error: 'User is not logged in.', success: false };
-    }
-
-    if (!isSupabaseConfigured) {
-      const updated = { ...profile, ...updates } as UserProfile;
-      setProfile(updated);
-      const stored = localStorage.getItem(DEMO_STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        parsed.profile = updated;
-        localStorage.setItem(DEMO_STORAGE_KEY, JSON.stringify(parsed));
-      }
-      return { error: null, success: true };
     }
 
     try {

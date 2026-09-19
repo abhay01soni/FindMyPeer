@@ -9,13 +9,12 @@ import {
   ArrowRight, 
   CheckCircle2, 
   AlertCircle, 
-  Sparkles, 
-  Terminal, 
   User, 
   Briefcase, 
   Loader2, 
   RefreshCw,
-  Database
+  Database,
+  Lock
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
@@ -45,7 +44,6 @@ export default function AuthModal() {
     return () => clearTimeout(timer);
   }, [resendCooldown]);
 
-  // Reset state on modal open/close
   useEffect(() => {
     if (isAuthModalOpen) {
       setStep('email');
@@ -76,7 +74,7 @@ export default function AuthModal() {
     } else if (success) {
       setStep('otp_sent');
       setResendCooldown(60);
-      setSuccessMessage('Magic link sent! Check your inbox or enter code.');
+      setSuccessMessage('Magic link sent to your email!');
     }
   };
 
@@ -100,13 +98,6 @@ export default function AuthModal() {
     }
   };
 
-  const handleDemoInstantLogin = async () => {
-    setLoading(true);
-    await verifyOtp(email || 'demo.builder@findmypeer.io', '123456');
-    setLoading(false);
-    closeAuthModal();
-  };
-
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
@@ -126,13 +117,13 @@ export default function AuthModal() {
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
           className="relative w-full max-w-lg bg-dark-900 border border-dark-700 rounded-xl shadow-2xl overflow-hidden z-10 font-sans"
         >
-          {/* Terminal Title Bar */}
+          {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 bg-dark-950 border-b border-dark-800 font-mono text-xs">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-coral-500/80 inline-block"></span>
               <span className="text-techGray-400">auth_daemon:</span>
               <span className="text-coral-400 font-bold">
-                {step === 'email' ? 'init_magiclink' : 'verify_token'}
+                {step === 'email' ? 'direct_magiclink' : 'verify_code'}
               </span>
             </div>
             
@@ -145,22 +136,18 @@ export default function AuthModal() {
             </button>
           </div>
 
-          {/* Body Content */}
+          {/* Content */}
           <div className="p-6 sm:p-8 space-y-6">
-            
-            {/* Supabase Status Banner */}
-            <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-dark-850 border border-dark-800 text-[11px] font-mono">
-              <div className="flex items-center gap-2">
-                <Database className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-techGray-300">DATA STORE:</span>
-                <span className="text-emerald-400 font-semibold">
-                  {isConfigured ? 'SUPABASE_LIVE' : 'SANDBOX_DEMO'}
-                </span>
-              </div>
-              <span className="text-techGray-500">AUTH: MAGICLINK/OTP</span>
-            </div>
 
-            {/* Error Message Alert */}
+            {!isConfigured && (
+              <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg flex items-start gap-2.5 text-amber-400 text-xs font-mono">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                <div>
+                  <strong>SUPABASE KEYS REQUIRED:</strong> Add your project URL and Anon key in <code className="text-white bg-dark-800 px-1 py-0.5 rounded">.env.local</code> to send live magic link emails.
+                </div>
+              </div>
+            )}
+
             {errorMessage && (
               <motion.div
                 initial={{ opacity: 0, y: -5 }}
@@ -172,7 +159,7 @@ export default function AuthModal() {
               </motion.div>
             )}
 
-            {/* STEP 1: Request Magic Link */}
+            {/* STEP 1: Email Form */}
             {step === 'email' ? (
               <form onSubmit={handleSendLink} className="space-y-5">
                 <div className="space-y-1.5">
@@ -180,13 +167,13 @@ export default function AuthModal() {
                     Sign in to <span className="text-coral-500 font-mono">FindMyPeer_</span>
                   </h3>
                   <p className="text-techGray-300 text-xs sm:text-sm">
-                    Enter your email to receive a passwordless magic login link & one-time passcode.
+                    Enter your email to receive your passwordless magic login link & single-use code.
                   </p>
                 </div>
 
-                {/* Account Type / Role Selection */}
+                {/* Role selection */}
                 <div className="space-y-1.5 font-mono text-xs">
-                  <label className="text-techGray-300">LOGIN AS ROLE</label>
+                  <label className="text-techGray-300 uppercase">SELECT ROLE</label>
                   <div className="grid grid-cols-2 gap-2 bg-dark-850 p-1 rounded-lg border border-dark-750">
                     <button
                       type="button"
@@ -215,10 +202,10 @@ export default function AuthModal() {
                   </div>
                 </div>
 
-                {/* Email Input */}
+                {/* Email input */}
                 <div className="space-y-1.5">
-                  <label className="block font-mono text-xs text-techGray-300">
-                    EMAIL ADDRESS <span className="text-coral-500">*</span>
+                  <label className="block font-mono text-xs text-techGray-300 uppercase">
+                    WORK OR PERSONAL EMAIL <span className="text-coral-500">*</span>
                   </label>
                   <div className="relative">
                     <Mail className="w-4 h-4 text-techGray-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -234,16 +221,16 @@ export default function AuthModal() {
                   </div>
                 </div>
 
-                {/* Submit Action */}
+                {/* Action button */}
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-coral-500 hover:bg-coral-600 disabled:opacity-50 text-dark-950 font-mono font-bold py-3.5 rounded-lg text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-coral-500/10 active:scale-[0.99] cursor-pointer"
+                  className="w-full bg-coral-500 hover:bg-coral-600 disabled:opacity-50 text-dark-950 font-mono font-bold py-3.5 rounded-lg text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-coral-500/10 cursor-pointer"
                 >
                   {loading ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>DISPATCHING_MAGIC_LINK...</span>
+                      <span>SENDING_MAGIC_LINK...</span>
                     </>
                   ) : (
                     <>
@@ -252,22 +239,9 @@ export default function AuthModal() {
                     </>
                   )}
                 </button>
-
-                {!isConfigured && (
-                  <div className="pt-2 border-t border-dark-800">
-                    <button
-                      type="button"
-                      onClick={handleDemoInstantLogin}
-                      className="w-full bg-dark-800 hover:bg-dark-750 border border-dark-700 text-techGray-300 hover:text-white font-mono text-xs py-2.5 rounded-md flex items-center justify-center gap-2 transition-colors cursor-pointer"
-                    >
-                      <Sparkles className="w-3.5 h-3.5 text-coral-400" />
-                      <span>Instant Sandbox Sign In (No Supabase keys needed)</span>
-                    </button>
-                  </div>
-                )}
               </form>
             ) : (
-              /* STEP 2: Magic Link Sent & OTP Input */
+              /* STEP 2: Sent confirmation & OTP input */
               <div className="space-y-6">
                 <div className="text-center space-y-3">
                   <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto">
@@ -275,10 +249,10 @@ export default function AuthModal() {
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-white font-sans">
-                      Check your email
+                      Magic link sent!
                     </h3>
                     <p className="text-techGray-300 text-xs sm:text-sm mt-1">
-                      We sent a secure magic login link to:
+                      Check your inbox or spam folder for:
                     </p>
                     <div className="inline-block mt-1 font-mono text-xs text-coral-400 bg-dark-850 px-3 py-1 rounded border border-dark-800">
                       {email}
@@ -286,12 +260,12 @@ export default function AuthModal() {
                   </div>
                 </div>
 
-                {/* OTP Verification Form */}
+                {/* OTP Form */}
                 <form onSubmit={handleVerifyOtp} className="space-y-4 pt-2">
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
                       <label className="block font-mono text-xs text-techGray-300">
-                        OR ENTER 6-DIGIT CODE
+                        ENTER 6-DIGIT EMAIL CODE
                       </label>
                       <span className="text-[11px] text-techGray-500 font-mono">FROM EMAIL</span>
                     </div>
@@ -328,7 +302,7 @@ export default function AuthModal() {
                   </button>
                 </form>
 
-                {/* Resend & Back options */}
+                {/* Controls */}
                 <div className="flex items-center justify-between pt-2 border-t border-dark-800 font-mono text-xs">
                   <button
                     type="button"
@@ -346,16 +320,16 @@ export default function AuthModal() {
                   >
                     <RefreshCw className="w-3 h-3" />
                     <span>
-                      {resendCooldown > 0 ? `resend in ${resendCooldown}s` : 'resend_link'}
+                      {resendCooldown > 0 ? `resend in ${resendCooldown}s` : 'resend_magic_link'}
                     </span>
                   </button>
                 </div>
               </div>
             )}
 
-            {/* Footer Notice */}
-            <div className="text-center font-mono text-[11px] text-techGray-500">
-              SECURED VIA SUPABASE AUTH & ROW LEVEL ENCRYPTION
+            <div className="text-center font-mono text-[11px] text-techGray-500 flex items-center justify-center gap-1">
+              <Lock className="w-3 h-3 text-coral-500" />
+              <span>POWERED BY SUPABASE AUTHENTICATION</span>
             </div>
 
           </div>

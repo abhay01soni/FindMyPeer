@@ -96,34 +96,40 @@ export default function UserProfileMenu() {
             {/* Storage Info */}
             <div className="py-2.5 my-1 font-mono text-[11px] text-techGray-400 space-y-1 bg-dark-850 px-2.5 rounded-md border border-dark-800">
               <div className="flex justify-between">
-                <span>AUTH SESSION:</span>
-                <span className="text-white">MAGICLINK_OTP</span>
+                <span>AUTH ENGINE:</span>
+                <span className="text-coral-400 font-bold">SUPABASE_MAGICLINK</span>
               </div>
               <div className="flex justify-between">
-                <span>STORAGE:</span>
-                <span className={isConfigured ? 'text-emerald-400' : 'text-amber-400'}>
-                  {isConfigured ? 'SUPABASE_PG' : 'LOCAL_SANDBOX'}
-                </span>
+                <span>DATA STORE:</span>
+                <span className="text-emerald-400 font-bold">SUPABASE_POSTGRES</span>
               </div>
             </div>
 
             {/* Quick Links */}
             <div className="py-2 space-y-1 font-mono text-xs">
               <a
-                href="#waitlist"
+                href="/dashboard/client"
                 onClick={() => setIsOpen(false)}
-                className="flex items-center gap-2 px-2.5 py-2 rounded-md text-techGray-300 hover:text-white hover:bg-dark-800 transition-colors"
+                className="flex items-center gap-2 px-2.5 py-2 rounded-md bg-coral-500/10 text-coral-400 border border-coral-500/30 hover:bg-coral-500/20 font-bold transition-colors"
               >
-                <Sparkles className="w-3.5 h-3.5 text-coral-400" />
-                <span>My Beta Status / Form</span>
+                <User className="w-3.5 h-3.5" />
+                <span>&gt; Client Dashboard</span>
               </a>
               <a
-                href="#advisors"
+                href="/dashboard/professional"
                 onClick={() => setIsOpen(false)}
                 className="flex items-center gap-2 px-2.5 py-2 rounded-md text-techGray-300 hover:text-white hover:bg-dark-800 transition-colors"
               >
-                <Briefcase className="w-3.5 h-3.5 text-techGray-400" />
-                <span>Browse Advisors</span>
+                <Briefcase className="w-3.5 h-3.5 text-coral-400" />
+                <span>&gt; Professional Dashboard</span>
+              </a>
+              <a
+                href="/#discover"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2 px-2.5 py-2 rounded-md text-techGray-300 hover:text-white hover:bg-dark-800 transition-colors"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-techGray-400" />
+                <span>Find Advisors Engine</span>
               </a>
             </div>
 
