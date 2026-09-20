@@ -9,6 +9,7 @@ import BookingsSection, { BookingRecord } from '@/components/dashboard/BookingsS
 import EarningsSection, { PaymentRecord } from '@/components/dashboard/EarningsSection';
 import ProfileServicesSection, { ProfessionalProfileData, ServiceRecord } from '@/components/dashboard/ProfileServicesSection';
 import ReviewsSection, { ReviewRecord } from '@/components/dashboard/ReviewsSection';
+import ProfileCompletionCard from '@/components/dashboard/ProfileCompletionCard';
 import { useAuth } from '@/context/AuthContext';
 import { createClient, isSupabaseConfigured } from '@/lib/supabase/client';
 import { 
@@ -24,7 +25,11 @@ import {
   ExternalLink,
   CheckCircle2,
   Terminal,
-  Layers
+  Layers,
+  Video,
+  Clock,
+  Link2,
+  CalendarCheck
 } from 'lucide-react';
 
 // Default initial data for rich MVP presentation
@@ -117,37 +122,25 @@ const MOCK_INITIAL_PAYMENTS: PaymentRecord[] = [
     id: 'pay-1',
     booking_id: 'bkg-100',
     client_name: 'Rohan Mehta',
-    service_title: 'Staff Engineer & Senior PM Career Roadmap',
-    amount_inr: 1999,
-    commission_inr: 240,
-    net_inr: 1759,
-    payout_status: 'paid',
+    service_title: '0 to 1 Product Strategy & PMF Validation',
+    amount_inr: 2999,
+    commission_inr: 360,
+    net_inr: 2639,
+    payout_status: 'processed',
     status: 'paid',
     created_at: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString(),
   },
   {
     id: 'pay-2',
-    booking_id: 'bkg-101',
-    client_name: 'Vikram Sharma',
-    service_title: '0 to 1 Product Strategy & PMF Validation',
-    amount_inr: 2999,
-    commission_inr: 360,
-    net_inr: 2639,
-    payout_status: 'pending',
-    status: 'paid',
-    created_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(),
-  },
-  {
-    id: 'pay-3',
-    booking_id: 'bkg-102',
-    client_name: 'Ananya Roy',
+    booking_id: 'bkg-99',
+    client_name: 'Kavita Sundaram',
     service_title: 'System Design Mock Interview & Architecture Sanity',
     amount_inr: 3999,
     commission_inr: 480,
     net_inr: 3519,
     payout_status: 'pending',
     status: 'paid',
-    created_at: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString(),
+    created_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(),
   },
 ];
 
@@ -176,7 +169,7 @@ export default function ProfessionalDashboardPage() {
   const { user, profile: authProfile, isLoading: authLoading, openAuthModal } = useAuth();
   const router = useRouter();
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'bookings' | 'earnings' | 'services' | 'reviews'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'upcoming' | 'meet_links' | 'calendar' | 'bookings' | 'earnings' | 'services' | 'reviews' | 'completion'>('overview');
 
   // Supabase Data States
   const [profileData, setProfileData] = useState<ProfessionalProfileData>(MOCK_INITIAL_PROFILE);
@@ -465,8 +458,14 @@ export default function ProfessionalDashboardPage() {
 
   // Calculated Stats
   const completedBookings = bookingsData.filter((b) => b.status === 'completed').length;
+  const upcomingBookingsCount = bookingsData.filter((b) => b.status === 'confirmed').length;
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
+
+  const hasBio = Boolean(profileData.bio && profileData.bio.trim().length > 10);
+  const hasServices = servicesData.length > 0;
+  const isCalendarConnected = Boolean(profileData.google_calendar_connected);
+  const completedSteps = [hasBio, hasServices, isCalendarConnected].filter(Boolean).length;
 
   const monthlyNetEarnings = paymentsData
     .filter((p) => {
@@ -504,139 +503,420 @@ export default function ProfessionalDashboardPage() {
             </div>
           </div>
 
-          {/* Checklist & Quick Stats Banner */}
-          <StatusBanner
-            hasBio={Boolean(profileData.bio && profileData.bio.trim().length > 10)}
-            hasServices={servicesData.length > 0}
-            isCalendarConnected={profileData.google_calendar_connected}
-            totalCompletedBookings={completedBookings}
-            ratingAvg={profileData.rating_avg || 5.0}
-            monthlyNetEarnings={monthlyNetEarnings > 0 ? monthlyNetEarnings : 7917}
-            onConnectCalendar={handleConnectCalendar}
-          />
+          {/* Main Dashboard Layout: Vertical Sidebar (Image 4) + Content Area */}
+          <div className="flex flex-col lg:flex-row items-start gap-8">
+            
+            {/* Left Vertical Sidebar (Matching Image 4) */}
+            <aside className="w-full lg:w-64 shrink-0 bg-dark-900 border border-dark-750 rounded-xl p-3 space-y-1 shadow-xl sticky top-24 font-mono text-xs">
+              <div className="px-3 py-2 text-[10px] text-techGray-500 uppercase tracking-wider font-bold">
+                NAVIGATION MENU
+              </div>
 
-          {/* Main Dashboard Navigation Tabs */}
-          <div className="bg-dark-900 p-1.5 rounded-xl border border-dark-750 flex flex-wrap items-center gap-2 font-mono text-xs">
-            <button
-              onClick={() => setActiveTab('overview')}
-              className={`px-4 py-2.5 rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
-                activeTab === 'overview'
-                  ? 'bg-coral-500 text-dark-950 font-bold shadow'
-                  : 'text-techGray-400 hover:text-white hover:bg-dark-850'
-              }`}
-            >
-              <Layers className="w-4 h-4" />
-              <span>Full Overview</span>
-            </button>
+              <button
+                onClick={() => setActiveTab('overview')}
+                className={`w-full px-3.5 py-3 rounded-lg transition-all flex items-center gap-3 cursor-pointer text-left relative ${
+                  activeTab === 'overview'
+                    ? 'bg-dark-850 text-coral-400 font-bold border border-dark-700 shadow-md'
+                    : 'text-techGray-400 hover:text-white hover:bg-dark-850/60'
+                }`}
+              >
+                {activeTab === 'overview' && (
+                  <div className="absolute left-0 top-2 bottom-2 w-1 bg-coral-500 rounded-r" />
+                )}
+                <Layers className={`w-4 h-4 ${activeTab === 'overview' ? 'text-coral-400' : 'text-techGray-500'}`} />
+                <span>Full Overview</span>
+              </button>
 
-            <button
-              onClick={() => setActiveTab('bookings')}
-              className={`px-4 py-2.5 rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
-                activeTab === 'bookings'
-                  ? 'bg-coral-500 text-dark-950 font-bold shadow'
-                  : 'text-techGray-400 hover:text-white hover:bg-dark-850'
-              }`}
-            >
-              <Calendar className="w-4 h-4" />
-              <span>Bookings ({bookingsData.length})</span>
-            </button>
+              {/* Upcoming Meetings Tab */}
+              <button
+                onClick={() => setActiveTab('upcoming')}
+                className={`w-full px-3.5 py-3 rounded-lg transition-all flex items-center gap-3 cursor-pointer text-left relative ${
+                  activeTab === 'upcoming'
+                    ? 'bg-dark-850 text-coral-400 font-bold border border-dark-700 shadow-md'
+                    : 'text-techGray-400 hover:text-white hover:bg-dark-850/60'
+                }`}
+              >
+                {activeTab === 'upcoming' && (
+                  <div className="absolute left-0 top-2 bottom-2 w-1 bg-coral-500 rounded-r" />
+                )}
+                <Clock className={`w-4 h-4 ${activeTab === 'upcoming' ? 'text-coral-400' : 'text-techGray-500'}`} />
+                <div className="flex items-center justify-between w-full">
+                  <span>Upcoming</span>
+                  <span className="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded text-[10px] border border-emerald-500/30 font-bold">
+                    {upcomingBookingsCount}
+                  </span>
+                </div>
+              </button>
 
-            <button
-              onClick={() => setActiveTab('earnings')}
-              className={`px-4 py-2.5 rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
-                activeTab === 'earnings'
-                  ? 'bg-coral-500 text-dark-950 font-bold shadow'
-                  : 'text-techGray-400 hover:text-white hover:bg-dark-850'
-              }`}
-            >
-              <IndianRupee className="w-4 h-4" />
-              <span>Earnings & Payouts</span>
-            </button>
+              {/* Meeting Links Tab */}
+              <button
+                onClick={() => setActiveTab('meet_links')}
+                className={`w-full px-3.5 py-3 rounded-lg transition-all flex items-center gap-3 cursor-pointer text-left relative ${
+                  activeTab === 'meet_links'
+                    ? 'bg-dark-850 text-coral-400 font-bold border border-dark-700 shadow-md'
+                    : 'text-techGray-400 hover:text-white hover:bg-dark-850/60'
+                }`}
+              >
+                {activeTab === 'meet_links' && (
+                  <div className="absolute left-0 top-2 bottom-2 w-1 bg-coral-500 rounded-r" />
+                )}
+                <Video className={`w-4 h-4 ${activeTab === 'meet_links' ? 'text-coral-400' : 'text-techGray-500'}`} />
+                <div className="flex items-center justify-between w-full">
+                  <span>Meeting Links</span>
+                  <span className="bg-dark-800 text-techGray-300 px-2 py-0.5 rounded text-[10px] border border-dark-700 font-mono">
+                    Google Meet
+                  </span>
+                </div>
+              </button>
 
-            <button
-              onClick={() => setActiveTab('services')}
-              className={`px-4 py-2.5 rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
-                activeTab === 'services'
-                  ? 'bg-coral-500 text-dark-950 font-bold shadow'
-                  : 'text-techGray-400 hover:text-white hover:bg-dark-850'
-              }`}
-            >
-              <Briefcase className="w-4 h-4" />
-              <span>Profile & Services ({servicesData.length})</span>
-            </button>
+              {/* Calendar Tab */}
+              <button
+                onClick={() => setActiveTab('calendar')}
+                className={`w-full px-3.5 py-3 rounded-lg transition-all flex items-center gap-3 cursor-pointer text-left relative ${
+                  activeTab === 'calendar'
+                    ? 'bg-dark-850 text-coral-400 font-bold border border-dark-700 shadow-md'
+                    : 'text-techGray-400 hover:text-white hover:bg-dark-850/60'
+                }`}
+              >
+                {activeTab === 'calendar' && (
+                  <div className="absolute left-0 top-2 bottom-2 w-1 bg-coral-500 rounded-r" />
+                )}
+                <CalendarCheck className={`w-4 h-4 ${activeTab === 'calendar' ? 'text-coral-400' : 'text-techGray-500'}`} />
+                <div className="flex items-center justify-between w-full">
+                  <span>Calendar</span>
+                  <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                    profileData.google_calendar_connected
+                      ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                      : 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                  }`}>
+                    {profileData.google_calendar_connected ? 'SYNCED' : 'NOT SYNCED'}
+                  </span>
+                </div>
+              </button>
 
-            <button
-              onClick={() => setActiveTab('reviews')}
-              className={`px-4 py-2.5 rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
-                activeTab === 'reviews'
-                  ? 'bg-coral-500 text-dark-950 font-bold shadow'
-                  : 'text-techGray-400 hover:text-white hover:bg-dark-850'
-              }`}
-            >
-              <MessageSquare className="w-4 h-4" />
-              <span>Reviews ({reviewsData.length})</span>
-            </button>
-          </div>
+              <button
+                onClick={() => setActiveTab('bookings')}
+                className={`w-full px-3.5 py-3 rounded-lg transition-all flex items-center gap-3 cursor-pointer text-left relative ${
+                  activeTab === 'bookings'
+                    ? 'bg-dark-850 text-coral-400 font-bold border border-dark-700 shadow-md'
+                    : 'text-techGray-400 hover:text-white hover:bg-dark-850/60'
+                }`}
+              >
+                {activeTab === 'bookings' && (
+                  <div className="absolute left-0 top-2 bottom-2 w-1 bg-coral-500 rounded-r" />
+                )}
+                <Calendar className={`w-4 h-4 ${activeTab === 'bookings' ? 'text-coral-400' : 'text-techGray-500'}`} />
+                <div className="flex items-center justify-between w-full">
+                  <span>Bookings</span>
+                  <span className="bg-dark-800 text-techGray-300 px-2 py-0.5 rounded text-[10px] border border-dark-700">
+                    {bookingsData.length}
+                  </span>
+                </div>
+              </button>
 
-          {/* Active Tab Views */}
-          {activeTab === 'overview' && (
-            <div className="space-y-10">
-              <BookingsSection
-                bookings={bookingsData}
-                onUpdateStatus={handleUpdateBookingStatus}
-                isLoading={dataLoading}
-              />
-              <EarningsSection payments={paymentsData} isLoading={dataLoading} />
-              <ProfileServicesSection
-                profile={profileData}
-                services={servicesData}
-                onSaveProfile={handleSaveProfile}
-                onAddService={handleAddService}
-                onToggleServiceActive={handleToggleServiceActive}
-                onUpdateService={handleUpdateService}
-                onConnectCalendar={handleConnectCalendar}
-                isLoading={dataLoading}
-              />
-              <ReviewsSection
-                reviews={reviewsData}
-                ratingAvg={profileData.rating_avg || 5.0}
-                isLoading={dataLoading}
-              />
+              <button
+                onClick={() => setActiveTab('earnings')}
+                className={`w-full px-3.5 py-3 rounded-lg transition-all flex items-center gap-3 cursor-pointer text-left relative ${
+                  activeTab === 'earnings'
+                    ? 'bg-dark-850 text-coral-400 font-bold border border-dark-700 shadow-md'
+                    : 'text-techGray-400 hover:text-white hover:bg-dark-850/60'
+                }`}
+              >
+                {activeTab === 'earnings' && (
+                  <div className="absolute left-0 top-2 bottom-2 w-1 bg-coral-500 rounded-r" />
+                )}
+                <IndianRupee className={`w-4 h-4 ${activeTab === 'earnings' ? 'text-coral-400' : 'text-techGray-500'}`} />
+                <span>Earnings & Payouts</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('services')}
+                className={`w-full px-3.5 py-3 rounded-lg transition-all flex items-center gap-3 cursor-pointer text-left relative ${
+                  activeTab === 'services'
+                    ? 'bg-dark-850 text-coral-400 font-bold border border-dark-700 shadow-md'
+                    : 'text-techGray-400 hover:text-white hover:bg-dark-850/60'
+                }`}
+              >
+                {activeTab === 'services' && (
+                  <div className="absolute left-0 top-2 bottom-2 w-1 bg-coral-500 rounded-r" />
+                )}
+                <Briefcase className={`w-4 h-4 ${activeTab === 'services' ? 'text-coral-400' : 'text-techGray-500'}`} />
+                <div className="flex items-center justify-between w-full">
+                  <span>Profile & Services</span>
+                  <span className="bg-dark-800 text-techGray-300 px-2 py-0.5 rounded text-[10px] border border-dark-700">
+                    {servicesData.length}
+                  </span>
+                </div>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('reviews')}
+                className={`w-full px-3.5 py-3 rounded-lg transition-all flex items-center gap-3 cursor-pointer text-left relative ${
+                  activeTab === 'reviews'
+                    ? 'bg-dark-850 text-coral-400 font-bold border border-dark-700 shadow-md'
+                    : 'text-techGray-400 hover:text-white hover:bg-dark-850/60'
+                }`}
+              >
+                {activeTab === 'reviews' && (
+                  <div className="absolute left-0 top-2 bottom-2 w-1 bg-coral-500 rounded-r" />
+                )}
+                <MessageSquare className={`w-4 h-4 ${activeTab === 'reviews' ? 'text-coral-400' : 'text-techGray-500'}`} />
+                <div className="flex items-center justify-between w-full">
+                  <span>Reviews</span>
+                  <span className="bg-dark-800 text-techGray-300 px-2 py-0.5 rounded text-[10px] border border-dark-700">
+                    {reviewsData.length}
+                  </span>
+                </div>
+              </button>
+
+              {/* Profile Completion Button (Below Reviews) */}
+              <button
+                onClick={() => setActiveTab('completion')}
+                className={`w-full px-3.5 py-3 rounded-lg transition-all flex items-center gap-3 cursor-pointer text-left relative ${
+                  activeTab === 'completion'
+                    ? 'bg-dark-850 text-coral-400 font-bold border border-dark-700 shadow-md'
+                    : 'text-techGray-400 hover:text-white hover:bg-dark-850/60'
+                }`}
+              >
+                {activeTab === 'completion' && (
+                  <div className="absolute left-0 top-2 bottom-2 w-1 bg-coral-500 rounded-r" />
+                )}
+                <Sparkles className={`w-4 h-4 ${activeTab === 'completion' ? 'text-coral-400' : 'text-techGray-500'}`} />
+                <div className="flex items-center justify-between w-full">
+                  <span>Profile Completion</span>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
+                    completedSteps === 3 
+                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' 
+                      : 'bg-coral-500/10 text-coral-400 border-coral-500/30'
+                  }`}>
+                    {completedSteps}/3
+                  </span>
+                </div>
+              </button>
+
+            </aside>
+
+            {/* Right Main Content Panel */}
+            <div className="flex-1 min-w-0 w-full space-y-8">
+              
+              {activeTab === 'overview' && (
+                <div className="space-y-10">
+                  {/* Status Banner with 4 Circular Animated Stat Cards */}
+                  <StatusBanner
+                    upcomingBookingsCount={upcomingBookingsCount}
+                    totalCompletedBookings={completedBookings}
+                    ratingAvg={profileData.rating_avg || 5.0}
+                    monthlyNetEarnings={monthlyNetEarnings > 0 ? monthlyNetEarnings : 7917}
+                    isCalendarConnected={profileData.google_calendar_connected}
+                    onConnectCalendar={handleConnectCalendar}
+                  />
+
+                  <BookingsSection
+                    bookings={bookingsData}
+                    onUpdateStatus={handleUpdateBookingStatus}
+                    isLoading={dataLoading}
+                  />
+                  <EarningsSection payments={paymentsData} isLoading={dataLoading} />
+                  <ProfileServicesSection
+                    profile={profileData}
+                    services={servicesData}
+                    onSaveProfile={handleSaveProfile}
+                    onAddService={handleAddService}
+                    onToggleServiceActive={handleToggleServiceActive}
+                    onUpdateService={handleUpdateService}
+                    onConnectCalendar={handleConnectCalendar}
+                    isLoading={dataLoading}
+                  />
+                  <ReviewsSection
+                    reviews={reviewsData}
+                    ratingAvg={profileData.rating_avg || 5.0}
+                    isLoading={dataLoading}
+                  />
+                </div>
+              )}
+
+              {activeTab === 'bookings' && (
+                <BookingsSection
+                  bookings={bookingsData}
+                  onUpdateStatus={handleUpdateBookingStatus}
+                  isLoading={dataLoading}
+                />
+              )}
+
+              {activeTab === 'earnings' && (
+                <EarningsSection payments={paymentsData} isLoading={dataLoading} />
+              )}
+
+              {activeTab === 'services' && (
+                <ProfileServicesSection
+                  profile={profileData}
+                  services={servicesData}
+                  onSaveProfile={handleSaveProfile}
+                  onAddService={handleAddService}
+                  onToggleServiceActive={handleToggleServiceActive}
+                  onUpdateService={handleUpdateService}
+                  onConnectCalendar={handleConnectCalendar}
+                  isLoading={dataLoading}
+                />
+              )}
+
+              {activeTab === 'reviews' && (
+                <ReviewsSection
+                  reviews={reviewsData}
+                  ratingAvg={profileData.rating_avg || 5.0}
+                  isLoading={dataLoading}
+                />
+              )}
+
+              {activeTab === 'upcoming' && (
+                <div className="space-y-6">
+                  <div className="bg-dark-900 border border-dark-750 p-6 rounded-xl space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                          <Clock className="w-5 h-5 text-emerald-400" />
+                          <span>Upcoming Scheduled Meetings</span>
+                        </h3>
+                        <p className="text-sm text-techGray-400 mt-1">
+                          All confirmed client consultation slots scheduled for upcoming dates.
+                        </p>
+                      </div>
+                      <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full text-xs font-mono font-bold">
+                        {upcomingBookingsCount} Scheduled
+                      </span>
+                    </div>
+
+                    <BookingsSection
+                      bookings={bookingsData.filter((b) => b.status === 'confirmed')}
+                      onUpdateStatus={handleUpdateBookingStatus}
+                      isLoading={dataLoading}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'meet_links' && (
+                <div className="space-y-6">
+                  <div className="bg-dark-900 border border-dark-750 p-6 rounded-xl space-y-6">
+                    <div>
+                      <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                        <Video className="w-5 h-5 text-coral-400" />
+                        <span>Instant Google Meet & Video Call Links</span>
+                      </h3>
+                      <p className="text-sm text-techGray-400 mt-1">
+                        Direct video room links generated automatically for confirmed advisory sessions.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {bookingsData
+                        .filter((b) => b.meet_link)
+                        .map((b) => (
+                          <div
+                            key={b.id}
+                            className="bg-dark-950 border border-dark-800 p-4 rounded-lg flex flex-col justify-between space-y-3"
+                          >
+                            <div className="space-y-1">
+                              <span className="text-xs font-mono text-coral-400 font-bold">
+                                {b.service_title}
+                              </span>
+                              <h4 className="font-bold text-white text-base">{b.client_name}</h4>
+                              <p className="text-xs text-techGray-400 font-mono">
+                                {new Date(b.slot_start).toLocaleString('en-US', {
+                                  weekday: 'short',
+                                  month: 'short',
+                                  day: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })}
+                              </p>
+                            </div>
+
+                            <a
+                              href={b.meet_link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="w-full bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 font-mono text-xs py-2 px-3 rounded flex items-center justify-center gap-2 transition-all font-bold"
+                            >
+                              <Video className="w-4 h-4" />
+                              <span>Join Google Meet</span>
+                              <ExternalLink className="w-3.5 h-3.5 ml-auto" />
+                            </a>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'calendar' && (
+                <div className="space-y-6">
+                  <div className="bg-dark-900 border border-dark-750 p-6 rounded-xl space-y-6">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div>
+                        <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                          <CalendarCheck className="w-5 h-5 text-coral-400" />
+                          <span>Google Calendar Integration</span>
+                        </h3>
+                        <p className="text-sm text-techGray-400 mt-1">
+                          Auto-sync your availability and prevent double booking across client calls.
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={handleConnectCalendar}
+                        className={`px-4 py-2.5 rounded-lg font-mono text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                          profileData.google_calendar_connected
+                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                            : 'bg-coral-500 text-dark-950 hover:bg-coral-400'
+                        }`}
+                      >
+                        <Calendar className="w-4 h-4" />
+                        <span>
+                          {profileData.google_calendar_connected
+                            ? '✓ Calendar Connected (Synced)'
+                            : 'Connect Google Calendar'}
+                        </span>
+                      </button>
+                    </div>
+
+                    <div className="bg-dark-950 border border-dark-800 p-5 rounded-lg space-y-3 font-mono text-xs">
+                      <div className="text-techGray-300 font-bold uppercase tracking-wider">
+                        SYDNED UPCOMING SLOTS ({bookingsData.length})
+                      </div>
+                      <div className="space-y-2">
+                        {bookingsData.map((b) => (
+                          <div
+                            key={b.id}
+                            className="flex items-center justify-between bg-dark-900 p-3 rounded border border-dark-800"
+                          >
+                            <div>
+                              <span className="text-white font-bold">{b.client_name}</span>
+                              <span className="text-techGray-400 font-normal"> — {b.service_title}</span>
+                            </div>
+                            <span className="text-coral-400">
+                              {new Date(b.slot_start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'completion' && (
+                <ProfileCompletionCard
+                  hasBio={hasBio}
+                  hasServices={hasServices}
+                  isCalendarConnected={isCalendarConnected}
+                  onConnectCalendar={handleConnectCalendar}
+                  onNavigateTab={(tab) => setActiveTab(tab)}
+                />
+              )}
+
             </div>
-          )}
-
-          {activeTab === 'bookings' && (
-            <BookingsSection
-              bookings={bookingsData}
-              onUpdateStatus={handleUpdateBookingStatus}
-              isLoading={dataLoading}
-            />
-          )}
-
-          {activeTab === 'earnings' && (
-            <EarningsSection payments={paymentsData} isLoading={dataLoading} />
-          )}
-
-          {activeTab === 'services' && (
-            <ProfileServicesSection
-              profile={profileData}
-              services={servicesData}
-              onSaveProfile={handleSaveProfile}
-              onAddService={handleAddService}
-              onToggleServiceActive={handleToggleServiceActive}
-              onUpdateService={handleUpdateService}
-              onConnectCalendar={handleConnectCalendar}
-              isLoading={dataLoading}
-            />
-          )}
-
-          {activeTab === 'reviews' && (
-            <ReviewsSection
-              reviews={reviewsData}
-              ratingAvg={profileData.rating_avg || 5.0}
-              isLoading={dataLoading}
-            />
-          )}
+          </div>
 
         </div>
       </div>

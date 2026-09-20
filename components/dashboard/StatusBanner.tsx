@@ -17,27 +17,22 @@ import {
 } from 'lucide-react';
 
 interface StatusBannerProps {
-  hasBio: boolean;
-  hasServices: boolean;
-  isCalendarConnected: boolean;
+  upcomingBookingsCount: number;
   totalCompletedBookings: number;
   ratingAvg: number;
   monthlyNetEarnings: number;
+  isCalendarConnected: boolean;
   onConnectCalendar: () => void;
 }
 
 export default function StatusBanner({
-  hasBio,
-  hasServices,
-  isCalendarConnected,
+  upcomingBookingsCount,
   totalCompletedBookings,
   ratingAvg,
   monthlyNetEarnings,
+  isCalendarConnected,
   onConnectCalendar,
 }: StatusBannerProps) {
-  const completedSteps = [hasBio, hasServices, isCalendarConnected].filter(Boolean).length;
-  const isProfileComplete = completedSteps === 3;
-
   return (
     <div className="space-y-6">
       {/* 1. Google Calendar Required Warning Banner (If not connected) */}
@@ -71,112 +66,106 @@ export default function StatusBanner({
         </div>
       )}
 
-      {/* 2. Top Header & Checklist */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      {/* 2. Top Header Stat Row: 4 Circular Animated Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 py-2">
         
-        {/* Profile Completion Card */}
-        <div className="lg:col-span-6 bg-dark-900 border border-dark-750 p-6 rounded-xl space-y-4 shadow-xl">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 font-mono text-xs text-coral-400">
-              <Sparkles className="w-4 h-4" />
-              <span>PROFILE COMPLETION STATUS</span>
+        {/* Circular Card 1: Upcoming Meetings */}
+        <div className="relative group flex justify-center">
+          {/* Pulsing Animated Glow Ring */}
+          <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-cyan-500/30 via-blue-500/20 to-cyan-500/30 blur-sm opacity-60 group-hover:opacity-100 transition-opacity animate-pulse" />
+          
+          <div className="relative w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-dark-900 border border-dark-700 shadow-2xl flex flex-col items-center justify-center p-3 text-center transition-transform duration-300 group-hover:scale-105">
+            <div className="w-8 h-8 rounded-full bg-cyan-500/15 border border-cyan-500/40 text-cyan-400 flex items-center justify-center mb-1 shrink-0">
+              <Calendar className="w-4 h-4" />
             </div>
-            <span className="font-mono text-xs text-techGray-400">
-              <strong className="text-white">{completedSteps}</strong> / 3 STEPS
+            
+            <span className="font-mono text-[9px] sm:text-[10px] text-techGray-400 uppercase tracking-tight">
+              UPCOMING MEETINGS
             </span>
-          </div>
-
-          {/* Progress Bar */}
-          <div className="w-full bg-dark-800 rounded-full h-2 overflow-hidden border border-dark-700">
-            <div 
-              className={`h-full transition-all duration-500 ${
-                isProfileComplete ? 'bg-emerald-500' : 'bg-coral-500'
-              }`}
-              style={{ width: `${(completedSteps / 3) * 100}%` }}
-            />
-          </div>
-
-          {/* Checklist Items */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs pt-1">
-            <div className={`p-2.5 rounded-lg border flex items-center justify-between ${
-              hasBio ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-dark-850 border-dark-750 text-techGray-400'
-            }`}>
-              <span>1. Bio Added</span>
-              {hasBio ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4 text-techGray-500" />}
+            
+            <div className="text-2xl sm:text-3xl font-bold font-mono text-white my-0.5">
+              {upcomingBookingsCount}
             </div>
-
-            <div className={`p-2.5 rounded-lg border flex items-center justify-between ${
-              hasServices ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-dark-850 border-dark-750 text-techGray-400'
-            }`}>
-              <span>2. Service Added</span>
-              {hasServices ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4 text-techGray-500" />}
-            </div>
-
-            <div className={`p-2.5 rounded-lg border flex items-center justify-between ${
-              isCalendarConnected ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-dark-850 border-dark-750 text-techGray-400'
-            }`}>
-              <span>3. GCal Synced</span>
-              {isCalendarConnected ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4 text-techGray-500" />}
+            
+            <div className="text-[9px] font-sans text-cyan-400 flex items-center gap-1">
+              <Clock className="w-2.5 h-2.5 text-cyan-400" />
+              <span>Scheduled 1:1 Calls</span>
             </div>
           </div>
         </div>
 
-        {/* 3. Quick Stat Cards (Completed Bookings, Rating Avg, Monthly Net) */}
-        <div className="lg:col-span-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* Circular Card 2: Completed Calls */}
+        <div className="relative group flex justify-center">
+          {/* Pulsing Animated Glow Ring */}
+          <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-coral-500/30 via-orange-500/20 to-coral-500/30 blur-sm opacity-60 group-hover:opacity-100 transition-opacity animate-pulse" />
           
-          {/* Card 1: Completed Bookings */}
-          <div className="bg-dark-900 border border-dark-750 p-5 rounded-xl space-y-2 shadow-xl flex flex-col justify-between">
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-[11px] text-techGray-400 uppercase">COMPLETED CALLS</span>
-              <div className="p-2 rounded bg-coral-500/10 border border-coral-500/20 text-coral-400">
-                <CheckCircle2 className="w-4 h-4" />
-              </div>
+          <div className="relative w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-dark-900 border border-dark-700 shadow-2xl flex flex-col items-center justify-center p-3 text-center transition-transform duration-300 group-hover:scale-105">
+            <div className="w-8 h-8 rounded-full bg-coral-500/15 border border-coral-500/40 text-coral-400 flex items-center justify-center mb-1 shrink-0">
+              <CheckCircle2 className="w-4 h-4" />
             </div>
-            <div>
-              <div className="text-3xl font-bold font-mono text-white">{totalCompletedBookings}</div>
-              <div className="text-[11px] font-sans text-techGray-400 mt-1 flex items-center gap-1">
-                <TrendingUp className="w-3 h-3 text-emerald-400" /> Total 1:1 Sessions
-              </div>
+            
+            <span className="font-mono text-[9px] sm:text-[10px] text-techGray-400 uppercase tracking-tight">
+              COMPLETED CALLS
+            </span>
+            
+            <div className="text-2xl sm:text-3xl font-bold font-mono text-white my-0.5">
+              {totalCompletedBookings}
             </div>
-          </div>
-
-          {/* Card 2: Rating Avg */}
-          <div className="bg-dark-900 border border-dark-750 p-5 rounded-xl space-y-2 shadow-xl flex flex-col justify-between">
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-[11px] text-techGray-400 uppercase">RATING AVERAGE</span>
-              <div className="p-2 rounded bg-amber-500/10 border border-amber-500/20 text-amber-400">
-                <Star className="w-4 h-4 fill-current" />
-              </div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold font-mono text-white flex items-baseline gap-1">
-                <span>{ratingAvg > 0 ? ratingAvg.toFixed(1) : '5.0'}</span>
-                <span className="text-xs text-amber-400 font-normal">/ 5.0 ★</span>
-              </div>
-              <div className="text-[11px] font-sans text-techGray-400 mt-1">
-                Client Satisfaction Score
-              </div>
+            
+            <div className="text-[9px] font-sans text-techGray-400 flex items-center gap-1">
+              <TrendingUp className="w-2.5 h-2.5 text-emerald-400" />
+              <span>Total 1:1 Sessions</span>
             </div>
           </div>
+        </div>
 
-          {/* Card 3: Monthly Net Earnings */}
-          <div className="bg-dark-900 border border-dark-750 p-5 rounded-xl space-y-2 shadow-xl flex flex-col justify-between">
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-[11px] text-techGray-400 uppercase">THIS MONTH NET</span>
-              <div className="p-2 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-                <IndianRupee className="w-4 h-4" />
-              </div>
+        {/* Circular Card 3: Rating Average */}
+        <div className="relative group flex justify-center">
+          {/* Pulsing Animated Glow Ring */}
+          <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-amber-500/30 via-yellow-500/20 to-amber-500/30 blur-sm opacity-60 group-hover:opacity-100 transition-opacity animate-pulse" />
+          
+          <div className="relative w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-dark-900 border border-dark-700 shadow-2xl flex flex-col items-center justify-center p-3 text-center transition-transform duration-300 group-hover:scale-105">
+            <div className="w-8 h-8 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-400 flex items-center justify-center mb-1 shrink-0">
+              <Star className="w-4 h-4 fill-current" />
             </div>
-            <div>
-              <div className="text-3xl font-bold font-mono text-white truncate">
-                ₹{monthlyNetEarnings.toLocaleString()}
-              </div>
-              <div className="text-[11px] font-sans text-emerald-400 mt-1 flex items-center gap-1">
-                <span>After 12% commission</span>
-              </div>
+            
+            <span className="font-mono text-[9px] sm:text-[10px] text-techGray-400 uppercase tracking-tight">
+              RATING AVERAGE
+            </span>
+            
+            <div className="text-xl sm:text-2xl font-bold font-mono text-white my-0.5 flex items-baseline gap-0.5">
+              <span>{ratingAvg > 0 ? ratingAvg.toFixed(1) : '5.0'}</span>
+              <span className="text-[10px] text-amber-400 font-normal">/ 5.0 ★</span>
+            </div>
+            
+            <div className="text-[9px] font-sans text-techGray-400">
+              Client Satisfaction
             </div>
           </div>
+        </div>
 
+        {/* Circular Card 4: Monthly Net Earnings */}
+        <div className="relative group flex justify-center">
+          {/* Pulsing Animated Glow Ring */}
+          <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-emerald-500/30 via-teal-500/20 to-emerald-500/30 blur-sm opacity-60 group-hover:opacity-100 transition-opacity animate-pulse" />
+          
+          <div className="relative w-36 h-36 sm:w-44 sm:h-44 rounded-full bg-dark-900 border border-dark-700 shadow-2xl flex flex-col items-center justify-center p-3 text-center transition-transform duration-300 group-hover:scale-105">
+            <div className="w-8 h-8 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mb-1 shrink-0">
+              <IndianRupee className="w-4 h-4" />
+            </div>
+            
+            <span className="font-mono text-[9px] sm:text-[10px] text-techGray-400 uppercase tracking-tight">
+              THIS MONTH NET
+            </span>
+            
+            <div className="text-xl sm:text-2xl font-bold font-mono text-white my-0.5 truncate max-w-full px-1">
+              ₹{monthlyNetEarnings.toLocaleString()}
+            </div>
+            
+            <div className="text-[9px] font-sans text-emerald-400">
+              After 12% commission
+            </div>
+          </div>
         </div>
 
       </div>

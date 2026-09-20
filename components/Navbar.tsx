@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Terminal, Menu, X, ArrowUpRight, LogIn, LogOut } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { Terminal, Menu, X, ArrowUpRight, LogIn, LogOut, Search } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import UserProfileMenu from './UserProfileMenu';
 import { useAuth } from '@/context/AuthContext';
@@ -10,6 +12,8 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, openAuthModal, signOut } = useAuth();
+  const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -21,25 +25,33 @@ export default function Navbar() {
 
   const scrollToSection = (id: string) => {
     setMobileMenuOpen(false);
+
+    if (pathname !== '/') {
+      router.push(`/#${id}`);
+      return;
+    }
+
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
+  const isDiscoverPage = pathname === '/discover';
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
+        scrolled || isDiscoverPage
           ? 'bg-dark-950/90 backdrop-blur-md border-b border-dark-700/60 py-3 shadow-2xl'
           : 'bg-transparent py-5'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
-          {/* Brand Logo - get.tech inspired monospace branding */}
-          <a
-            href="#"
+          {/* Brand Logo */}
+          <Link
+            href="/"
             className="flex items-center gap-2 group focus:outline-none"
           >
             <div className="bg-dark-800 border border-dark-700 p-1.5 rounded text-coral-500 group-hover:border-coral-500/50 transition-colors">
@@ -53,46 +65,25 @@ export default function Navbar() {
                 1:1 EXPERT DIRECTORY
               </span>
             </div>
-          </a>
+          </Link>
 
           {/* Desktop Links */}
           <nav className="hidden md:flex items-center gap-8 font-mono text-sm">
-            <button
-              onClick={() => scrollToSection('niches')}
-              className="text-techGray-300 hover:text-white transition-colors flex items-center gap-1 hover:translate-y-[-1px] duration-150 cursor-pointer"
-            >
-              <span className="text-coral-500 text-xs">/</span> niches
-            </button>
-            <button
-              onClick={() => scrollToSection('advisors')}
-              className="text-techGray-300 hover:text-white transition-colors flex items-center gap-1 hover:translate-y-[-1px] duration-150 cursor-pointer"
-            >
-              <span className="text-coral-500 text-xs">/</span> advisors
-            </button>
-            <button
-              onClick={() => scrollToSection('discover')}
-              className="text-techGray-300 hover:text-coral-400 transition-colors flex items-center gap-1 hover:translate-y-[-1px] duration-150 cursor-pointer relative"
+            <Link
+              href="/discover"
+              className={`transition-colors flex items-center gap-1 hover:translate-y-[-1px] duration-150 cursor-pointer relative ${
+                isDiscoverPage ? 'text-coral-400 font-bold' : 'text-techGray-300 hover:text-coral-400'
+              }`}
             >
               <span className="text-coral-500 text-xs">/</span> discover
               <span className="bg-coral-500/20 text-coral-400 text-[10px] px-1 py-0.2 rounded border border-coral-500/30">new</span>
-            </button>
+            </Link>
+
             <button
               onClick={() => scrollToSection('how-it-works')}
               className="text-techGray-300 hover:text-white transition-colors flex items-center gap-1 hover:translate-y-[-1px] duration-150 cursor-pointer"
             >
               <span className="text-coral-500 text-xs">/</span> how_it_works
-            </button>
-            <button
-              onClick={() => scrollToSection('trust')}
-              className="text-techGray-300 hover:text-white transition-colors flex items-center gap-1 hover:translate-y-[-1px] duration-150 cursor-pointer"
-            >
-              <span className="text-coral-500 text-xs">/</span> trust_offer
-            </button>
-            <button
-              onClick={() => scrollToSection('faq')}
-              className="text-techGray-300 hover:text-white transition-colors flex items-center gap-1 hover:translate-y-[-1px] duration-150 cursor-pointer"
-            >
-              <span className="text-coral-500 text-xs">/</span> faq
             </button>
           </nav>
 
@@ -138,41 +129,19 @@ export default function Navbar() {
         {/* Mobile Dropdown */}
         {mobileMenuOpen && (
           <div className="md:hidden mt-4 p-4 bg-dark-900 border border-dark-700 rounded-lg shadow-2xl space-y-4 font-mono text-sm">
-            <button
-              onClick={() => scrollToSection('niches')}
-              className="block w-full text-left py-2 text-techGray-300 hover:text-white border-b border-dark-800"
-            >
-              / niches
-            </button>
-            <button
-              onClick={() => scrollToSection('advisors')}
-              className="block w-full text-left py-2 text-techGray-300 hover:text-white border-b border-dark-800"
-            >
-              / advisors
-            </button>
-            <button
-              onClick={() => scrollToSection('discover')}
+            <Link
+              href="/discover"
+              onClick={() => setMobileMenuOpen(false)}
               className="block w-full text-left py-2 text-coral-400 hover:text-coral-300 border-b border-dark-800 font-bold"
             >
-              / discover (find advisor engine)
-            </button>
+              / discover (find advisor directory)
+            </Link>
+
             <button
               onClick={() => scrollToSection('how-it-works')}
               className="block w-full text-left py-2 text-techGray-300 hover:text-white border-b border-dark-800"
             >
               / how_it_works
-            </button>
-            <button
-              onClick={() => scrollToSection('trust')}
-              className="block w-full text-left py-2 text-techGray-300 hover:text-white border-b border-dark-800"
-            >
-              / trust_offer
-            </button>
-            <button
-              onClick={() => scrollToSection('faq')}
-              className="block w-full text-left py-2 text-techGray-300 hover:text-white border-b border-dark-800"
-            >
-              / faq
             </button>
             
             <div className="pt-2 flex flex-col gap-2">

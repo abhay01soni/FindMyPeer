@@ -30,6 +30,7 @@ export interface DiscoveryAdvisor {
   handle: string;
   avatarSeed: string;
   initials: string;
+  photoUrl: string;
   currentRole: string;
   company: string;
   category: string;
@@ -54,6 +55,7 @@ const DISCOVERY_ADVISORS: DiscoveryAdvisor[] = [
     handle: '@arjun_pm',
     avatarSeed: 'arjun-kapoor',
     initials: 'AK',
+    photoUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=80&h=80&fit=crop&crop=face',
     currentRole: 'Staff Product Manager',
     company: 'Ex-Google',
     category: 'Product & Startup',
@@ -76,6 +78,7 @@ const DISCOVERY_ADVISORS: DiscoveryAdvisor[] = [
     handle: '@rhea_dist',
     avatarSeed: 'rhea-sharma',
     initials: 'RS',
+    photoUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&h=80&fit=crop&crop=face',
     currentRole: 'Lead Distributed Systems Architect',
     company: 'Razorpay',
     category: 'Technology & Engineering',
@@ -98,6 +101,7 @@ const DISCOVERY_ADVISORS: DiscoveryAdvisor[] = [
     handle: '@vikram_vc',
     avatarSeed: 'vikram-sengupta',
     initials: 'VS',
+    photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face',
     currentRole: 'Series A Founder (Exited $12M)',
     company: 'Angel Investor',
     category: 'Fundraising & Strategy',
@@ -120,6 +124,7 @@ const DISCOVERY_ADVISORS: DiscoveryAdvisor[] = [
     handle: '@deepika_talent',
     avatarSeed: 'deepika-nair',
     initials: 'DN',
+    photoUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=80&h=80&fit=crop&crop=face',
     currentRole: 'Director of Talent & Org',
     company: 'Ex-McKinsey / Swiggy',
     category: 'Career & Executive',
@@ -142,6 +147,7 @@ const DISCOVERY_ADVISORS: DiscoveryAdvisor[] = [
     handle: '@sameer_cloud',
     avatarSeed: 'sameer-chen',
     initials: 'SC',
+    photoUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face',
     currentRole: 'Principal Cloud Architect',
     company: 'AWS Ex-Lead',
     category: 'Cloud & DevOps',
@@ -164,6 +170,7 @@ const DISCOVERY_ADVISORS: DiscoveryAdvisor[] = [
     handle: '@neha_legal',
     avatarSeed: 'neha-verma',
     initials: 'NV',
+    photoUrl: 'https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=80&h=80&fit=crop&crop=face',
     currentRole: 'Founding Partner & Legal Counsel',
     company: 'Startup Legal Advisors',
     category: 'Finance & Compliance',
@@ -186,6 +193,7 @@ const DISCOVERY_ADVISORS: DiscoveryAdvisor[] = [
     handle: '@aditya_ai',
     avatarSeed: 'aditya-joshi',
     initials: 'AJ',
+    photoUrl: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=80&h=80&fit=crop&crop=face',
     currentRole: 'Staff AI Research Engineer',
     company: 'Ex-Meta AI',
     category: 'Technology & Engineering',
@@ -208,6 +216,7 @@ const DISCOVERY_ADVISORS: DiscoveryAdvisor[] = [
     handle: '@priya_growth',
     avatarSeed: 'priya-deshmukh',
     initials: 'PD',
+    photoUrl: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=80&h=80&fit=crop&crop=face',
     currentRole: 'VP of Growth & Retention',
     company: 'Ex-Zomato',
     category: 'Product & Startup',
@@ -235,6 +244,67 @@ const CATEGORIES = [
   'Cloud & DevOps',
   'Finance & Compliance'
 ];
+
+const getCategoryTheme = (category: string) => {
+  switch (category) {
+    case 'Product & Startup':
+      return {
+        avatarBg: 'bg-rose-500/20 text-rose-400 border-rose-500/40',
+        badgeBg: 'bg-rose-500/10 text-rose-400 border-rose-500/30',
+        rowHover: 'hover:bg-rose-950/20',
+        accentText: 'text-rose-400',
+        chipBg: 'bg-rose-500/10 text-rose-300 border-rose-500/20',
+        cardBorder: 'border-rose-500/30 shadow-rose-500/5',
+      };
+    case 'Technology & Engineering':
+      return {
+        avatarBg: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40',
+        badgeBg: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
+        rowHover: 'hover:bg-emerald-950/20',
+        accentText: 'text-emerald-400',
+        chipBg: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20',
+        cardBorder: 'border-emerald-500/30 shadow-emerald-500/5',
+      };
+    case 'Fundraising & Strategy':
+      return {
+        avatarBg: 'bg-amber-500/20 text-amber-400 border-amber-500/40',
+        badgeBg: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
+        rowHover: 'hover:bg-amber-950/20',
+        accentText: 'text-amber-400',
+        chipBg: 'bg-amber-500/10 text-amber-300 border-amber-500/20',
+        cardBorder: 'border-amber-500/30 shadow-amber-500/5',
+      };
+    case 'Career & Executive':
+      return {
+        avatarBg: 'bg-purple-500/20 text-purple-400 border-purple-500/40',
+        badgeBg: 'bg-purple-500/10 text-purple-400 border-purple-500/30',
+        rowHover: 'hover:bg-purple-950/20',
+        accentText: 'text-purple-400',
+        chipBg: 'bg-purple-500/10 text-purple-300 border-purple-500/20',
+        cardBorder: 'border-purple-500/30 shadow-purple-500/5',
+      };
+    case 'Cloud & DevOps':
+      return {
+        avatarBg: 'bg-blue-500/20 text-blue-400 border-blue-500/40',
+        badgeBg: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
+        rowHover: 'hover:bg-blue-950/20',
+        accentText: 'text-blue-400',
+        chipBg: 'bg-blue-500/10 text-blue-300 border-blue-500/20',
+        cardBorder: 'border-blue-500/30 shadow-blue-500/5',
+      };
+    case 'Finance & Compliance':
+    default:
+      return {
+        avatarBg: 'bg-teal-500/20 text-teal-400 border-teal-500/40',
+        badgeBg: 'bg-teal-500/10 text-teal-400 border-teal-500/30',
+        rowHover: 'hover:bg-teal-950/20',
+        accentText: 'text-teal-400',
+        chipBg: 'bg-teal-500/10 text-teal-300 border-teal-500/20',
+        cardBorder: 'border-teal-500/30 shadow-teal-500/5',
+      };
+  }
+};
+
 
 export default function AdvisorDiscovery() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -490,7 +560,7 @@ export default function AdvisorDiscovery() {
 
         </div>
 
-        {/* RESULTS: TABLE VIEW (Influencer Discovery Style) */}
+        {/* RESULTS: TABLE VIEW (Influencer Discovery Style with distinct category colors) */}
         {viewMode === 'table' ? (
           <div className="bg-dark-900 border border-dark-700 rounded-xl overflow-hidden shadow-2xl">
             <div className="overflow-x-auto">
@@ -506,7 +576,7 @@ export default function AdvisorDiscovery() {
                     <th className="py-4 px-5 text-right">ACTION</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-dark-800 font-sans text-sm">
+                <tbody className="divide-y divide-dark-800/80 font-sans text-sm">
                   {filteredAdvisors.length === 0 ? (
                     <tr>
                       <td colSpan={7} className="py-16 text-center">
@@ -522,181 +592,219 @@ export default function AdvisorDiscovery() {
                       </td>
                     </tr>
                   ) : (
-                    filteredAdvisors.map((adv) => (
-                      <tr
-                        key={adv.id}
-                        className="hover:bg-dark-850/60 transition-colors group"
-                      >
-                        {/* Advisor info & handle */}
-                        <td className="py-4 px-5">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-coral-500/15 border border-coral-500/30 text-coral-400 font-mono font-bold flex items-center justify-center shrink-0">
-                              {adv.initials}
-                            </div>
-                            <div>
-                              <div className="flex items-center gap-1.5">
-                                <span className="font-bold text-white group-hover:text-coral-400 transition-colors">
-                                  {adv.name}
-                                </span>
-                                {adv.isVerified && (
-                                  <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                                )}
-                              </div>
-                              <div className="font-mono text-xs text-techGray-400 flex items-center gap-1.5">
-                                <span className="text-coral-400">{adv.handle}</span>
-                                <span>•</span>
-                                <span className="text-techGray-300 font-medium">{adv.company}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </td>
+                    filteredAdvisors.map((adv) => {
+                      const theme = getCategoryTheme(adv.category);
 
-                        {/* Domain & Subcategory tags */}
-                        <td className="py-4 px-4 max-w-xs">
-                          <div className="space-y-1">
-                            <span className="font-mono text-xs text-techGray-200 block font-medium">
-                              {adv.category}
-                            </span>
-                            <div className="flex flex-wrap gap-1">
-                              {adv.subcategories.slice(0, 2).map((sub, i) => (
-                                <span
-                                  key={i}
-                                  className="text-[10px] font-mono bg-dark-800 text-techGray-400 px-1.5 py-0.5 rounded border border-dark-750"
+                      return (
+                        <tr
+                          key={adv.id}
+                          className={`${theme.rowHover} transition-colors group`}
+                        >
+                          {/* Advisor info & handle */}
+                          <td className="py-4 px-5">
+                            <div className="flex items-center gap-3">
+                              <div className="relative w-10 h-10 shrink-0">
+                                <img
+                                  src={adv.photoUrl}
+                                  alt={adv.name}
+                                  className={`w-10 h-10 rounded-full object-cover border-2 ${theme.avatarBg.includes('rose') ? 'border-rose-500/50' : theme.avatarBg.includes('emerald') ? 'border-emerald-500/50' : theme.avatarBg.includes('amber') ? 'border-amber-500/50' : theme.avatarBg.includes('purple') ? 'border-purple-500/50' : theme.avatarBg.includes('blue') ? 'border-blue-500/50' : 'border-teal-500/50'}`}
+                                  onError={(e) => {
+                                    const target = e.currentTarget;
+                                    target.style.display = 'none';
+                                    target.nextElementSibling?.removeAttribute('style');
+                                  }}
+                                />
+                                <div
+                                  className={`w-10 h-10 rounded-full font-mono font-bold text-xs flex items-center justify-center border ${theme.avatarBg}`}
+                                  style={{ display: 'none' }}
                                 >
-                                  {sub}
-                                </span>
-                              ))}
+                                  {adv.initials}
+                                </div>
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="font-bold text-white group-hover:text-coral-400 transition-colors">
+                                    {adv.name}
+                                  </span>
+                                  {adv.isVerified && (
+                                    <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                                  )}
+                                </div>
+                                <div className="font-mono text-xs text-techGray-400 flex items-center gap-1.5">
+                                  <span className={theme.accentText}>{adv.handle}</span>
+                                  <span>•</span>
+                                  <span className="text-techGray-300 font-medium">{adv.company}</span>
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        </td>
+                          </td>
 
-                        {/* Experience */}
-                        <td className="py-4 px-4 text-center font-mono text-xs text-techGray-300">
-                          <span className="bg-dark-800 px-2.5 py-1 rounded border border-dark-750">
-                            {adv.experienceYears}+ yrs
-                          </span>
-                        </td>
-
-                        {/* Rating & Sessions */}
-                        <td className="py-4 px-4 text-center">
-                          <div className="inline-flex flex-col items-center">
-                            <div className="flex items-center gap-1 font-mono text-xs font-bold text-amber-400">
-                              <Star className="w-3.5 h-3.5 fill-current" />
-                              <span>{adv.rating.toFixed(1)}</span>
+                          {/* Domain & Subcategory tags */}
+                          <td className="py-4 px-4 max-w-xs">
+                            <div className="space-y-1">
+                              <span className={`font-mono text-xs font-bold block ${theme.accentText}`}>
+                                {adv.category}
+                              </span>
+                              <div className="flex flex-wrap gap-1">
+                                {adv.subcategories.slice(0, 2).map((sub, i) => (
+                                  <span
+                                    key={i}
+                                    className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${theme.chipBg}`}
+                                  >
+                                    {sub}
+                                  </span>
+                                ))}
+                              </div>
                             </div>
-                            <span className="font-mono text-[10px] text-techGray-400">
-                              {adv.sessionsCompleted} calls done
+                          </td>
+
+                          {/* Experience */}
+                          <td className="py-4 px-4 text-center font-mono text-xs text-techGray-300">
+                            <span className="bg-dark-800 px-2.5 py-1 rounded border border-dark-750">
+                              {adv.experienceYears}+ yrs
                             </span>
-                          </div>
-                        </td>
+                          </td>
 
-                        {/* Next Available Slot */}
-                        <td className="py-4 px-4">
-                          <div className="flex items-center gap-1.5 font-mono text-xs text-emerald-400">
-                            <Clock className="w-3.5 h-3.5 shrink-0" />
-                            <span>{adv.availableSlot}</span>
-                          </div>
-                        </td>
+                          {/* Rating & Sessions */}
+                          <td className="py-4 px-4 text-center">
+                            <div className="inline-flex flex-col items-center">
+                              <div className="flex items-center gap-1 font-mono text-xs font-bold text-amber-400">
+                                <Star className="w-3.5 h-3.5 fill-current" />
+                                <span>{adv.rating.toFixed(1)}</span>
+                              </div>
+                              <span className="font-mono text-[10px] text-techGray-400">
+                                {adv.sessionsCompleted} calls done
+                              </span>
+                            </div>
+                          </td>
 
-                        {/* Session Rate */}
-                        <td className="py-4 px-4">
-                          <div className="font-mono">
-                            <span className="font-bold text-white text-sm">
-                              ₹{adv.hourlyRateINR.toLocaleString()}
-                            </span>
-                            <span className="text-techGray-500 text-xs"> / 1:1</span>
-                          </div>
-                        </td>
+                          {/* Next Available Slot */}
+                          <td className="py-4 px-4">
+                            <div className="flex items-center gap-1.5 font-mono text-xs text-emerald-400">
+                              <Clock className="w-3.5 h-3.5 shrink-0" />
+                              <span>{adv.availableSlot}</span>
+                            </div>
+                          </td>
 
-                        {/* Action */}
-                        <td className="py-4 px-5 text-right">
-                          <button
-                            onClick={() => setSelectedAdvisor(adv)}
-                            className="bg-coral-500 hover:bg-coral-600 text-dark-950 font-mono text-xs font-bold px-3 py-2 rounded-md transition-all inline-flex items-center gap-1 shadow hover:scale-105 active:scale-95 cursor-pointer"
-                          >
-                            <span>&gt; book_slot</span>
-                            <ArrowUpRight className="w-3.5 h-3.5" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))
+                          {/* Session Rate */}
+                          <td className="py-4 px-4">
+                            <div className="font-mono">
+                              <span className="font-bold text-white text-sm">
+                                ₹{adv.hourlyRateINR.toLocaleString()}
+                              </span>
+                              <span className="text-techGray-500 text-xs"> / 1:1</span>
+                            </div>
+                          </td>
+
+                          {/* Action */}
+                          <td className="py-4 px-5 text-right">
+                            <button
+                              onClick={() => setSelectedAdvisor(adv)}
+                              className="bg-coral-500 hover:bg-coral-600 text-dark-950 font-mono text-xs font-bold px-3.5 py-2 rounded-md transition-all inline-flex items-center gap-1 shadow hover:scale-105 active:scale-95 cursor-pointer"
+                            >
+                              <span>&gt; book_slot</span>
+                              <ArrowUpRight className="w-3.5 h-3.5" />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
                   )}
                 </tbody>
               </table>
             </div>
           </div>
         ) : (
-          /* RESULTS: GRID VIEW */
+          /* RESULTS: GRID VIEW WITH DISTINCT CATEGORY COLORS */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredAdvisors.map((adv) => (
-              <div
-                key={adv.id}
-                className="bg-dark-900 border border-dark-700/80 hover:border-coral-500/50 p-6 rounded-xl transition-all duration-200 flex flex-col justify-between space-y-5 group shadow-lg"
-              >
-                <div className="space-y-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-lg bg-coral-500/15 border border-coral-500/40 text-coral-400 font-mono font-bold text-base flex items-center justify-center">
-                        {adv.initials}
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-white group-hover:text-coral-400 transition-colors flex items-center gap-1.5 text-base">
-                          {adv.name}
-                          <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
-                        </h4>
-                        <div className="font-mono text-xs text-techGray-400">
-                          {adv.currentRole} • <span className="text-white">{adv.company}</span>
+            {filteredAdvisors.map((adv) => {
+              const theme = getCategoryTheme(adv.category);
+
+              return (
+                <div
+                  key={adv.id}
+                  className={`bg-dark-900 border ${theme.cardBorder} hover:border-coral-500/50 p-6 rounded-xl transition-all duration-200 flex flex-col justify-between space-y-5 group shadow-lg`}
+                >
+                  <div className="space-y-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="relative w-12 h-12 shrink-0">
+                          <img
+                            src={adv.photoUrl}
+                            alt={adv.name}
+                            className={`w-12 h-12 rounded-full object-cover border-2 ${theme.avatarBg.includes('rose') ? 'border-rose-500/50' : theme.avatarBg.includes('emerald') ? 'border-emerald-500/50' : theme.avatarBg.includes('amber') ? 'border-amber-500/50' : theme.avatarBg.includes('purple') ? 'border-purple-500/50' : theme.avatarBg.includes('blue') ? 'border-blue-500/50' : 'border-teal-500/50'}`}
+                            onError={(e) => {
+                              const target = e.currentTarget;
+                              target.style.display = 'none';
+                              target.nextElementSibling?.removeAttribute('style');
+                            }}
+                          />
+                          <div
+                            className={`w-12 h-12 rounded-full font-mono font-bold text-base flex items-center justify-center border ${theme.avatarBg}`}
+                            style={{ display: 'none' }}
+                          >
+                            {adv.initials}
+                          </div>
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-white group-hover:text-coral-400 transition-colors flex items-center gap-1.5 text-base">
+                            {adv.name}
+                            <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+                          </h4>
+                          <div className="font-mono text-xs text-techGray-400">
+                            {adv.currentRole} • <span className="text-white">{adv.company}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
+
+                    <p className="text-techGray-300 text-xs line-clamp-2 font-sans">
+                      {adv.bio}
+                    </p>
+
+                    <div className="flex flex-wrap gap-1.5 font-mono text-xs">
+                      {adv.subcategories.map((sub, i) => (
+                        <span
+                          key={i}
+                          className={`border px-2 py-0.5 rounded text-[11px] ${theme.chipBg}`}
+                        >
+                          {sub}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs font-mono pt-3 border-t border-dark-800 text-techGray-400">
+                      <div className="flex items-center gap-1 text-amber-400 font-bold">
+                        <Star className="w-3.5 h-3.5 fill-current" />
+                        <span>{adv.rating.toFixed(1)}</span>
+                        <span className="text-techGray-400 font-normal">({adv.reviewCount})</span>
+                      </div>
+                      <div className="text-emerald-400 flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5" />
+                        <span>{adv.availableSlot}</span>
+                      </div>
+                    </div>
                   </div>
 
-                  <p className="text-techGray-300 text-xs line-clamp-2 font-sans">
-                    {adv.bio}
-                  </p>
-
-                  <div className="flex flex-wrap gap-1.5 font-mono text-xs">
-                    {adv.subcategories.map((sub, i) => (
-                      <span
-                        key={i}
-                        className="bg-dark-850 text-techGray-300 border border-dark-750 px-2 py-0.5 rounded text-[11px]"
-                      >
-                        {sub}
+                  <div className="pt-3 border-t border-dark-800 flex items-center justify-between">
+                    <div>
+                      <span className="text-[10px] font-mono text-techGray-400 block">SESSION RATE</span>
+                      <span className="font-mono font-bold text-white text-base">
+                        ₹{adv.hourlyRateINR.toLocaleString()}
                       </span>
-                    ))}
-                  </div>
+                    </div>
 
-                  <div className="flex items-center justify-between text-xs font-mono pt-3 border-t border-dark-800 text-techGray-400">
-                    <div className="flex items-center gap-1 text-amber-400 font-bold">
-                      <Star className="w-3.5 h-3.5 fill-current" />
-                      <span>{adv.rating.toFixed(1)}</span>
-                      <span className="text-techGray-400 font-normal">({adv.reviewCount})</span>
-                    </div>
-                    <div className="text-emerald-400 flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5" />
-                      <span>{adv.availableSlot}</span>
-                    </div>
+                    <button
+                      onClick={() => setSelectedAdvisor(adv)}
+                      className="bg-coral-500 hover:bg-coral-600 text-dark-950 font-mono text-xs font-bold px-3.5 py-2 rounded-md transition-all flex items-center gap-1 cursor-pointer"
+                    >
+                      <span>&gt; book_slot</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
-
-                <div className="pt-3 border-t border-dark-800 flex items-center justify-between">
-                  <div>
-                    <span className="text-[10px] font-mono text-techGray-400 block">SESSION RATE</span>
-                    <span className="font-mono font-bold text-white text-base">
-                      ₹{adv.hourlyRateINR.toLocaleString()}
-                    </span>
-                  </div>
-
-                  <button
-                    onClick={() => setSelectedAdvisor(adv)}
-                    className="bg-coral-500 hover:bg-coral-600 text-dark-950 font-mono text-xs font-bold px-3.5 py-2 rounded-md transition-all flex items-center gap-1 cursor-pointer"
-                  >
-                    <span>&gt; book_slot</span>
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 

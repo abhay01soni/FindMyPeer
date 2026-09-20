@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp, ArrowRight, Layers, Sparkles } from 'lucide-react';
+import Link from 'next/link';
 
 interface SubNiche {
   id: string;
@@ -18,6 +19,14 @@ interface Niche {
   description: string;
   advisorCount: number;
   domainChip: string;
+  colorTheme: {
+    bg: string;
+    border: string;
+    borderExpanded: string;
+    tag: string;
+    accent: string;
+    button: string;
+  };
   subNiches: SubNiche[];
 }
 
@@ -29,6 +38,14 @@ const NICHES_DATA: Niche[] = [
     description: 'Product-market fit validation, fundraising strategy, GTM execution, and pitch deck teardowns.',
     advisorCount: 48,
     domainChip: 'www.startup.peer',
+    colorTheme: {
+      bg: 'bg-gradient-to-r from-rose-950/30 via-dark-900 to-dark-900',
+      border: 'border-rose-500/30 hover:border-rose-500/60 shadow-rose-500/5',
+      borderExpanded: 'border-rose-500/70 shadow-2xl shadow-rose-500/10',
+      tag: 'bg-rose-500/15 text-rose-400 border-rose-500/30',
+      accent: 'text-rose-400',
+      button: 'bg-rose-500 text-dark-950 border-rose-400',
+    },
     subNiches: [
       { id: 'fundraising', name: 'Fundraising Strategy', description: 'Pitch deck review, investor positioning & cap table advice', advisorCount: 14 },
       { id: 'pmf', name: 'Product-Market Fit', description: 'User interview teardowns, retention analysis & validation', advisorCount: 12 },
@@ -43,6 +60,14 @@ const NICHES_DATA: Niche[] = [
     description: 'Resume & LinkedIn teardowns, mock system design/PM interviews, and salary negotiation.',
     advisorCount: 62,
     domainChip: 'www.career.peer',
+    colorTheme: {
+      bg: 'bg-gradient-to-r from-amber-950/30 via-dark-900 to-dark-900',
+      border: 'border-amber-500/30 hover:border-amber-500/60 shadow-amber-500/5',
+      borderExpanded: 'border-amber-500/70 shadow-2xl shadow-amber-500/10',
+      tag: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+      accent: 'text-amber-400',
+      button: 'bg-amber-500 text-dark-950 border-amber-400',
+    },
     subNiches: [
       { id: 'resume', name: 'Resume & LinkedIn', description: 'High-impact bullet rewrites & recruiter visibility', advisorCount: 18 },
       { id: 'mock-int', name: 'Mock Interviews', description: 'System design, coding & PM mock rounds with actionable feedback', advisorCount: 20 },
@@ -57,6 +82,14 @@ const NICHES_DATA: Niche[] = [
     description: 'System design reviews, code & architecture audits, engineering leadership & tech stack decisions.',
     advisorCount: 75,
     domainChip: 'www.tech.peer',
+    colorTheme: {
+      bg: 'bg-gradient-to-r from-emerald-950/30 via-dark-900 to-dark-900',
+      border: 'border-emerald-500/30 hover:border-emerald-500/60 shadow-emerald-500/5',
+      borderExpanded: 'border-emerald-500/70 shadow-2xl shadow-emerald-500/10',
+      tag: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+      accent: 'text-emerald-400',
+      button: 'bg-emerald-500 text-dark-950 border-emerald-400',
+    },
     subNiches: [
       { id: 'sys-design', name: 'System Design', description: 'High-availability architecture, microservices & scale reviews', advisorCount: 22 },
       { id: 'code-review', name: 'Code Review & Security', description: 'Architecture sanity checks, code refactoring & security', advisorCount: 18 },
@@ -71,6 +104,14 @@ const NICHES_DATA: Niche[] = [
     description: 'Startup runway management, India tax & regulatory compliance, cap table legal & personal finance.',
     advisorCount: 34,
     domainChip: 'www.finance.peer',
+    colorTheme: {
+      bg: 'bg-gradient-to-r from-violet-950/30 via-dark-900 to-dark-900',
+      border: 'border-violet-500/30 hover:border-violet-500/60 shadow-violet-500/5',
+      borderExpanded: 'border-violet-500/70 shadow-2xl shadow-violet-500/10',
+      tag: 'bg-violet-500/15 text-violet-400 border-violet-500/30',
+      accent: 'text-violet-400',
+      button: 'bg-violet-500 text-dark-950 border-violet-400',
+    },
     subNiches: [
       { id: 'runway', name: 'Startup Finance & Runway', description: 'Financial modeling, cash flow planning & burn rate', advisorCount: 9 },
       { id: 'tax-india', name: 'Tax & Compliance (India)', description: 'GST, MCA compliance, ESOP structures & Angel Tax', advisorCount: 10 },
@@ -85,6 +126,14 @@ const NICHES_DATA: Niche[] = [
     description: 'Founder stress & burnout management, peak energy habits, fitness planning & executive coaching.',
     advisorCount: 28,
     domainChip: 'www.wellness.peer',
+    colorTheme: {
+      bg: 'bg-gradient-to-r from-cyan-950/30 via-dark-900 to-dark-900',
+      border: 'border-cyan-500/30 hover:border-cyan-500/60 shadow-cyan-500/5',
+      borderExpanded: 'border-cyan-500/70 shadow-2xl shadow-cyan-500/10',
+      tag: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
+      accent: 'text-cyan-400',
+      button: 'bg-cyan-500 text-dark-950 border-cyan-400',
+    },
     subNiches: [
       { id: 'fitness', name: 'Fitness & Nutrition Planning', description: 'Sustained energy routines for high-stress executives', advisorCount: 8 },
       { id: 'burnout', name: 'Stress & Burnout', description: 'Workload boundary setting & cognitive recovery frameworks', advisorCount: 8 },
@@ -111,13 +160,6 @@ export default function NicheGrid() {
     setExpandedId(prev => (prev === id ? null : id));
   };
 
-  const scrollToAdvisors = (subNicheName: string) => {
-    const target = document.getElementById('advisors');
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   const filteredNiches = NICHES_DATA.filter(niche => {
     if (activeTab === 'ALL NICHES') return true;
     return niche.categoryTag === activeTab;
@@ -127,7 +169,7 @@ export default function NicheGrid() {
     <section id="niches" className="py-24 bg-dark-950 border-t border-dark-800 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Header - get.tech style typography */}
+        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 pb-8 border-b border-dark-800">
           <div>
             <div className="font-mono text-xs text-coral-500 mb-2 flex items-center gap-1.5 uppercase tracking-wider">
@@ -137,7 +179,7 @@ export default function NicheGrid() {
               explore advisory <span className="text-coral-500 font-mono">niches_</span>
             </h2>
             <p className="text-techGray-300 font-sans mt-3 max-w-xl text-base">
-              Click any category to expand in-place and inspect verified sub-niches and advisor counts.
+              Distinct color-coded advisory domains. Click any card to inspect verified sub-niches and advisor counts.
             </p>
           </div>
           <div className="mt-4 md:mt-0 font-mono text-xs text-techGray-400">
@@ -145,7 +187,7 @@ export default function NicheGrid() {
           </div>
         </div>
 
-        {/* get.tech category filter sub-bar (Image 2 style) */}
+        {/* Category filter sub-bar */}
         <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 no-scrollbar font-mono text-xs border-b border-dark-850">
           {CATEGORY_TABS.map((tab, idx) => (
             <React.Fragment key={tab}>
@@ -166,23 +208,22 @@ export default function NicheGrid() {
           ))}
         </div>
 
-        {/* Main Niche Cards Grid */}
+        {/* Color-differentiated Niche Cards Grid */}
         <div className="space-y-6">
           {filteredNiches.map((niche) => {
             const isExpanded = expandedId === niche.id;
+            const theme = niche.colorTheme;
 
             return (
               <motion.div
                 key={niche.id}
                 layout
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
-                className={`rounded-xl border transition-all duration-300 overflow-hidden ${
-                  isExpanded
-                    ? 'bg-dark-850 border-coral-500/50 shadow-2xl shadow-coral-500/5'
-                    : 'bg-dark-900 hover:bg-dark-850 border-dark-800 hover:border-dark-700'
+                className={`rounded-xl border transition-all duration-300 overflow-hidden ${theme.bg} ${
+                  isExpanded ? theme.borderExpanded : theme.border
                 }`}
               >
-                {/* Main Card Header / Click area */}
+                {/* Main Card Header */}
                 <div
                   onClick={() => handleCardClick(niche.id)}
                   className="p-6 md:p-8 cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-6 select-none"
@@ -198,7 +239,7 @@ export default function NicheGrid() {
                 >
                   <div className="space-y-2 max-w-3xl">
                     <div className="flex items-center gap-3">
-                      <span className="font-mono text-xs px-2.5 py-0.5 rounded bg-dark-800 text-coral-400 border border-dark-700 font-medium">
+                      <span className={`font-mono text-xs px-2.5 py-0.5 rounded font-bold border ${theme.tag}`}>
                         {niche.categoryTag}
                       </span>
                       <span className="font-mono text-xs text-techGray-400">
@@ -206,7 +247,7 @@ export default function NicheGrid() {
                       </span>
                     </div>
 
-                    <h3 className="text-2xl sm:text-3xl font-sans font-bold text-white group-hover:text-coral-400 transition-colors">
+                    <h3 className={`text-2xl sm:text-3xl font-sans font-bold text-white group-hover:${theme.accent} transition-colors`}>
                       {niche.title}
                     </h3>
 
@@ -215,16 +256,16 @@ export default function NicheGrid() {
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-6 shrink-0 border-t md:border-t-0 border-dark-800 pt-4 md:pt-0">
+                  <div className="flex items-center gap-6 shrink-0 border-t md:border-t-0 border-dark-800/80 pt-4 md:pt-0">
                     <div className="text-right font-mono">
-                      <div className="text-xl font-bold text-white">{niche.advisorCount}</div>
+                      <div className={`text-xl font-bold ${theme.accent}`}>{niche.advisorCount}</div>
                       <div className="text-[11px] text-techGray-400 uppercase">ADVISORS READY</div>
                     </div>
 
                     <div className={`p-2.5 rounded-lg border font-mono text-xs transition-colors ${
                       isExpanded
-                        ? 'bg-coral-500 text-dark-950 border-coral-400 font-bold'
-                        : 'bg-dark-800 text-techGray-300 border-dark-700 group-hover:border-coral-500/40'
+                        ? `${theme.button} font-bold shadow-md`
+                        : 'bg-dark-800 text-techGray-300 border-dark-700'
                     }`}>
                       {isExpanded ? (
                         <div className="flex items-center gap-1.5">
@@ -241,7 +282,7 @@ export default function NicheGrid() {
                   </div>
                 </div>
 
-                {/* Smooth in-place height expand area */}
+                {/* Sub-niches Height Expand Area */}
                 <AnimatePresence initial={false}>
                   {isExpanded && (
                     <motion.div
@@ -249,20 +290,20 @@ export default function NicheGrid() {
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                      className="border-t border-dark-700/60 bg-dark-950/60"
+                      className="border-t border-dark-800/80 bg-dark-950/70"
                     >
                       <div className="p-6 md:p-8 space-y-4">
                         <div className="font-mono text-xs text-techGray-400 flex items-center justify-between">
                           <span className="flex items-center gap-1.5">
-                            <Sparkles className="w-3.5 h-3.5 text-coral-400" />
+                            <Sparkles className={`w-3.5 h-3.5 ${theme.accent}`} />
                             SUB-NICHES IN THIS CATEGORY ({niche.subNiches.length}):
                           </span>
-                          <span className="text-coral-400 hidden sm:inline">
-                            CLICK TO VIEW FILTERED ADVISORS &rarr;
-                          </span>
+                          <Link href="/discover" className={`${theme.accent} font-bold hidden sm:inline hover:underline`}>
+                            GO TO DISCOVER DIRECTORY &rarr;
+                          </Link>
                         </div>
 
-                        {/* Staggered Sub-niche Cards Grid */}
+                        {/* Color Tinted Sub-niche Cards */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                           {niche.subNiches.map((sub, idx) => (
                             <motion.div
@@ -270,15 +311,14 @@ export default function NicheGrid() {
                               initial={{ opacity: 0, y: 12 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ duration: 0.25, delay: idx * 0.05 }}
-                              onClick={() => scrollToAdvisors(sub.name)}
-                              className="group p-4 bg-dark-900 border border-dark-800 hover:border-coral-500/50 rounded-lg cursor-pointer transition-all duration-200 hover:scale-[1.02] flex flex-col justify-between"
+                              className={`group p-4 bg-dark-900/90 border rounded-lg transition-all duration-200 hover:scale-[1.02] flex flex-col justify-between ${theme.border}`}
                             >
                               <div className="space-y-1.5">
                                 <div className="flex items-center justify-between">
-                                  <span className="font-sans font-semibold text-white text-sm group-hover:text-coral-400 transition-colors">
+                                  <span className={`font-sans font-semibold text-white text-sm group-hover:${theme.accent} transition-colors`}>
                                     {sub.name}
                                   </span>
-                                  <ArrowRight className="w-3.5 h-3.5 text-techGray-500 group-hover:text-coral-400 group-hover:translate-x-1 transition-all" />
+                                  <ArrowRight className={`w-3.5 h-3.5 text-techGray-500 group-hover:${theme.accent} group-hover:translate-x-1 transition-all`} />
                                 </div>
                                 <p className="text-techGray-400 text-xs font-sans leading-snug">
                                   {sub.description}
@@ -287,9 +327,9 @@ export default function NicheGrid() {
 
                               <div className="mt-4 pt-3 border-t border-dark-850 flex items-center justify-between font-mono text-[11px] text-techGray-400">
                                 <span>{sub.advisorCount} experts</span>
-                                <span className="text-coral-500 font-bold group-hover:underline">
+                                <Link href="/discover" className={`${theme.accent} font-bold group-hover:underline`}>
                                   explore
-                                </span>
+                                </Link>
                               </div>
                             </motion.div>
                           ))}

@@ -22,6 +22,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { uploadImageToCloudinary } from '@/lib/cloudinary';
 
 export interface ProfessionalProfileData {
   id?: string;
@@ -154,18 +155,19 @@ export default function ProfileServicesSection({
     }
   };
 
-  const handlePhotoUploadSimulated = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setIsUploadingPhoto(true);
-    // Simulate Cloudinary upload URL generation
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setProfileForm((prev) => ({ ...prev, photo_url: reader.result as string }));
+    try {
+      const url = await uploadImageToCloudinary(file);
+      setProfileForm((prev) => ({ ...prev, photo_url: url }));
+    } catch (err) {
+      console.error('Photo upload failed:', err);
+    } finally {
       setIsUploadingPhoto(false);
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
   return (
@@ -206,7 +208,7 @@ export default function ProfileServicesSection({
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={handlePhotoUploadSimulated}
+                  onChange={handlePhotoUpload}
                   className="hidden"
                 />
               </label>
