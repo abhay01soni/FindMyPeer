@@ -21,7 +21,7 @@ export interface PaymentRecord {
   amount_inr: number;
   commission_inr: number;
   net_inr: number;
-  payout_status: 'pending' | 'paid';
+  payout_status: 'pending' | 'paid' | 'processed';
   status: 'created' | 'paid' | 'failed' | 'refunded';
   created_at: string;
 }

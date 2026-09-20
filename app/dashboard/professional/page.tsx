@@ -126,7 +126,7 @@ const MOCK_INITIAL_PAYMENTS: PaymentRecord[] = [
     amount_inr: 2999,
     commission_inr: 360,
     net_inr: 2639,
-    payout_status: 'processed',
+    payout_status: 'paid',
     status: 'paid',
     created_at: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString(),
   },
@@ -833,7 +833,7 @@ export default function ProfessionalDashboardPage() {
                             </div>
 
                             <a
-                              href={b.meet_link}
+                              href={b.meet_link || '#'}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="w-full bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 font-mono text-xs py-2 px-3 rounded flex items-center justify-center gap-2 transition-all font-bold"
